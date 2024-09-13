@@ -2,7 +2,7 @@
 
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable-next-line MD036 -->
-_✨ 喜欢发送奶龙的小朋友，你好呐~ ✨_
+_✨ 一个基于分类模型的简单插件~ ✨_
 <!-- prettier-ignore-end -->
 
 ## 声明
