@@ -4,6 +4,7 @@ import numpy as np
 import torch
 from torch import nn
 from torchvision import transforms
+import site
 transform = transforms.Compose([transforms.ToTensor(),
                                 transforms.Normalize(mean=0.5, std=0.5)])
 class Net(nn.Module):
@@ -45,8 +46,9 @@ class Net(nn.Module):
         x = self.lin2(x)
         return x
 model=Net()
-if os.path.exists('Nailong(0.7123).pth'):
-    model.load_state_dict(torch.load('Nailong(0.7123).pth', weights_only=True, map_location='cpu'))
+model_path=os.path.join(site.getusersitepackages()[1],r'nonebot_plugin_nailongremove\Nailong(0.7123).pth')
+if os.path.exists(model_path):
+    model.load_state_dict(torch.load(model_path, weights_only=True, map_location='cpu'))
 model.eval()
 def check_image(image: np.ndarray) -> bool:
     """
