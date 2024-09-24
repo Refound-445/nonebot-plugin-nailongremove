@@ -7,7 +7,7 @@ from .handler import *
 
 __plugin_meta__ = PluginMetadata(
     name="NailongRemove",
-    description="喜欢发奶龙的小朋友，你好呐~",
+    description="一个基于分类模型的简单插件~",
     usage="只要群内有人发奶龙就会被撤回",
     type="application",
     homepage="https://github.com/Refound-445/onoebot-plugin-nailongremove",

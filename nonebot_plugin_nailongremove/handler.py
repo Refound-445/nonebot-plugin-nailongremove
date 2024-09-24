@@ -9,7 +9,6 @@ from nonebot import on_message
 from nonebot.adapters.onebot.v11 import Bot, MessageEvent, GroupMessageEvent
 from PIL import Image
 import io
-from .model import *
 
 
 logger = logging.getLogger(__name__)
@@ -47,6 +46,8 @@ async def group_message_contains_image(event: MessageEvent) -> bool:
         return True
     return False
 
+def check_image(image):
+    return True
 
 weather =on_message(rule=Rule(group_message_contains_image))
 @weather.handle()

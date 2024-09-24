@@ -1,3 +1,4 @@
+import os.path
 import cv2
 import numpy as np
 import torch
@@ -44,7 +45,9 @@ class Net(nn.Module):
         x = self.lin2(x)
         return x
 model=Net()
-model.load_state_dict(torch.load('../Nailong(0.7123).pth', weights_only=True, map_location='cpu'))
+if os.path.exists('Nailong(0.7123).pth'):
+    model.load_state_dict(torch.load('Nailong(0.7123).pth', weights_only=True, map_location='cpu'))
+model.eval()
 def check_image(image: np.ndarray) -> bool:
     """
     :param image: OpenCV图像数组。
@@ -53,8 +56,9 @@ def check_image(image: np.ndarray) -> bool:
     image = cv2.resize(image, (32, 32))
     image = transform(image)
     image = image.unsqueeze(0)
-    output = model(image)
-    if output.argmax(1)==10:
-        return True
-    else:
-        return False
+    with torch.no_grad():
+        output = model(image)
+        if output.argmax(1)==10:
+            return True
+        else:
+            return False

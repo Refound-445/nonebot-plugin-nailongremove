@@ -40,5 +40,5 @@ pip install nonebot_plugin_nailongremove
 欢迎大家进群一起学习交流~
 ## 许可证
 
-`noneBot_plugin_picsbank` 采用 `MIT` 协议开源，协议文件参考 [LICENSE](./LICENSE)。
+`noneBot_plugin_picsbank` 采用 `MIT` 协议开源，协议文件参考 [LICENSE](../plugins/nonebot_plugin_picsbank-master/LICENSE)。
 
