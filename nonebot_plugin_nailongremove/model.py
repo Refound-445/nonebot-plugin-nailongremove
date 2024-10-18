@@ -1,18 +1,14 @@
-import os.path
+import os
 from pathlib import Path
 
 import cv2
 import numpy as np
 import torch
-import shutil
 from torch import nn
 from torchvision import transforms
-import site
-
+from torch.hub import load_state_dict_from_url
 transform = transforms.Compose([transforms.ToTensor(),
                                 transforms.Normalize(mean=0.5, std=0.5)])
-
-
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -51,17 +47,13 @@ class Net(nn.Module):
         x = self.drop(x)
         x = self.lin2(x)
         return x
-
-
-model = Net()
-ori_path = os.path.join(site.getusersitepackages()[1], r'nonebot_plugin_nailongremove\Nailong(0.7123).pth')
-model_path = os.path.join(Path(__file__).parent, "Nailong(0.7123).pth")
-if not os.path.exists(model_path):
-    shutil.move(ori_path, model_path)
-if os.path.exists(model_path):
-    model.load_state_dict(torch.load(model_path, weights_only=True, map_location='cpu'))
-model.eval()
-
+model=Net()
+if os.path.exists(os.path.join(Path(__file__).parent, 'Nailong.0.7123.pth')):
+    model.load_state_dict(torch.load(os.path.join(Path(__file__).parent, 'Nailong.0.7123.pth'), weights_only=True, map_location='cpu'))
+else:
+    url='https://github.com/Refound-445/nonebot-plugin-nailongremove/releases/download/weights/Nailong.0.7123.pth'
+    state_dict=load_state_dict_from_url(url=url,model_dir=Path(__file__).parent,map_location='cpu',check_hash=True,progress=True)
+    model.load_state_dict(state_dict)
 def check_image(image: np.ndarray) -> bool:
     """
     :param image: OpenCV图像数组。
@@ -70,9 +62,8 @@ def check_image(image: np.ndarray) -> bool:
     image = cv2.resize(image, (32, 32))
     image = transform(image)
     image = image.unsqueeze(0)
-    with torch.no_grad():
-        output = model(image)
-        if output.argmax(1) == 10:
-            return True
-        else:
-            return False
+    output = model(image)
+    if output.argmax(1)==10:
+        return True
+    else:
+        return False
