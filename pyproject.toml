@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-plugin-nailongremove"
-version = "1.1.6"
+version = "1.1.7"
 description = "一个基于图像分类模型的撤回图片插件"
 authors = ["445 <2877834692@qq.com>"]
 readme = "README.md"

@@ -48,10 +48,10 @@ class Net(nn.Module):
         x = self.lin2(x)
         return x
 model=Net()
-if os.path.exists(os.path.join(Path(__file__).parent, 'Nailong.0.7123.pth')):
-    model.load_state_dict(torch.load(os.path.join(Path(__file__).parent, 'Nailong.0.7123.pth'), weights_only=True, map_location='cpu'))
+if os.path.exists(os.path.join(Path(__file__).parent, 'nailong.pth')):
+    model.load_state_dict(torch.load(os.path.join(Path(__file__).parent, 'nailong.pth'), weights_only=True, map_location='cpu'))
 else:
-    url='https://github.com/Refound-445/nonebot-plugin-nailongremove/releases/download/weights/Nailong.0.7123.pth'
+    url='https://github.com/Refound-445/nonebot-plugin-nailongremove/releases/download/weights/nailong.pth'
     state_dict=load_state_dict_from_url(url=url,model_dir=Path(__file__).parent,map_location='cpu',check_hash=True,progress=True)
     model.load_state_dict(state_dict)
 def check_image(image: np.ndarray) -> bool:
