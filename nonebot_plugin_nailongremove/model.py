@@ -1,14 +1,17 @@
-import os
-from pathlib import Path
-
 import cv2
 import numpy as np
 import torch
-from torch import nn
-from torchvision import transforms
+from torch import Tensor, nn
 from torch.hub import load_state_dict_from_url
-transform = transforms.Compose([transforms.ToTensor(),
-                                transforms.Normalize(mean=0.5, std=0.5)])
+from torchvision import transforms
+
+from .config import config
+
+transform = transforms.Compose(
+    [transforms.ToTensor(), transforms.Normalize(mean=0.5, std=0.5)],
+)
+
+
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -29,7 +32,7 @@ class Net(nn.Module):
         self.drop = nn.Dropout(0.25)
         self.lin2 = nn.Linear(64, 11)
 
-    def forward(self, x):
+    def forward(self, x: Tensor):
         x = self.conv1(x)
         x = self.max1(x)
         x = self.bn1(x)
@@ -45,15 +48,31 @@ class Net(nn.Module):
         x = self.fla(x)
         x = self.lin1(x)
         x = self.drop(x)
-        x = self.lin2(x)
-        return x
-model=Net()
-if os.path.exists(os.path.join(Path(__file__).parent, 'nailong.pth')):
-    model.load_state_dict(torch.load(os.path.join(Path(__file__).parent, 'nailong.pth'), weights_only=True, map_location='cpu'))
+        return self.lin2(x)
+
+
+model_filename = "nailong.pth"
+model = Net()
+if config.nailong_model_dir.exists():
+    model.load_state_dict(
+        torch.load(
+            config.nailong_model_dir / model_filename,
+            weights_only=True,
+            map_location="cpu",
+        ),
+    )
 else:
-    url='https://github.com/Refound-445/nonebot-plugin-nailongremove/releases/download/weights/nailong.pth'
-    state_dict=load_state_dict_from_url(url=url,model_dir=Path(__file__).parent,map_location='cpu',check_hash=True,progress=True)
+    url = f"https://github.com/Refound-445/nonebot-plugin-nailongremove/releases/download/weights/{model_filename}"
+    state_dict = load_state_dict_from_url(
+        url=url,
+        model_dir=str(config.nailong_model_dir),
+        map_location="cpu",
+        check_hash=True,
+        progress=True,
+    )
     model.load_state_dict(state_dict)
+
+
 def check_image(image: np.ndarray) -> bool:
     """
     :param image: OpenCV图像数组。
@@ -61,9 +80,6 @@ def check_image(image: np.ndarray) -> bool:
     """
     image = cv2.resize(image, (32, 32))
     image = transform(image)
-    image = image.unsqueeze(0)
+    image = image.unsqueeze(0)  # type: ignore
     output = model(image)
-    if output.argmax(1)==10:
-        return True
-    else:
-        return False
+    return output.argmax(1) == 10
