@@ -1,35 +1,51 @@
-[tool.poetry]
+[project]
 name = "nonebot-plugin-nailongremove"
-version = "1.1.7"
+dynamic = ["version"]
 description = "一个基于图像分类模型的撤回图片插件"
-authors = ["445 <2877834692@qq.com>"]
+authors = [{ name = "445", email = "2877834692@qq.com" }]
+requires-python = "<4.0,>=3.9"
+dependencies = [
+    "nonebot2>=2.2.0",
+    "opencv-python>=4.5",
+    "numpy>=1.19",
+    "keras>=2.4",
+    "pillow>=10",
+    "torch>=2.4",
+    "torchvision>=0.19",
+    "nonebot-plugin-alconna>=0.53.1",
+    "nonebot-plugin-uninfo>=0.5.0",
+]
+license = { text = "MIT" }
 readme = "README.md"
+keywords = ["nonebot", "plugin", "image"]
+
+[project.urls]
 homepage = "https://github.com/Refound-445/onoebot-plugin-nailongremove"
 repository = "https://github.com/Refound-445/onoebot-plugin-nailongremove"
-keywords = ["nonebot", "plugin", "image"]
-include=['nonebot_plugin_nailongremove/Nailong(0.7123).pth']
-
-[tool.poetry.dependencies]
-python = "^3.9"
-nonebot2 = "^2.2.0"
-nonebot-adapter-onebot = "^2.0.0"
-opencv-python = "^4.5"
-numpy = "^1.19"
-keras = "^2.4"
-nonebot-plugin-apscheduler = "^0.4.0"
-pillow="^10"
-torch="^2.4"
-torchvision="^0.19"
-httpx = ">=0.27.0"
-
-[tool.poetry.dev-dependencies]
-pytest = "^5.2"
-
-[[tool.poetry.source]]
-name = "mirrors"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-priority = "primary"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "nonebot-adapter-discord>=0.1.8",
+    "nonebot-adapter-dodo>=0.2.1",
+    "nonebot-adapter-feishu>=2.6.0",
+    "nonebot-adapter-kaiheila>=0.3.4",
+    "nonebot-adapter-kritor>=0.3.2",
+    "nonebot-adapter-mirai>=2.3.3",
+    "nonebot-adapter-onebot>=2.4.5",
+    "nonebot-adapter-qq>=1.5.2",
+    "nonebot-adapter-red>=0.9.0",
+    "nonebot-adapter-satori>=0.12.6",
+    "nonebot-adapter-telegram>=0.1.0b18",
+    "nonebot-adapter-tailchat>=0.1.0b12",
+]
+
+[tool.pdm.build]
+includes = []
+
+[tool.pdm.version]
+source = "file"
+path = "nonebot_plugin_nailongremove/__init__.py"

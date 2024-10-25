@@ -1,70 +1,120 @@
-import logging
+import io
+from typing import Iterable, TypeVar, cast
 
-import httpx
 import cv2
 import numpy as np
-
+from nonebot import logger, on_message
+from nonebot.adapters import Bot as BaseBot, Event as BaseEvent
+from nonebot.drivers import Request
+from nonebot.matcher import Matcher
+from nonebot.permission import SUPERUSER
 from nonebot.rule import Rule
-from nonebot import on_message
-from nonebot.adapters.onebot.v11 import Bot, MessageEvent, GroupMessageEvent
-from PIL import Image
-import io
-from .model import *
+from nonebot.typing import T_State
+from nonebot.utils import run_sync
+from nonebot_plugin_alconna.builtins.uniseg.market_face import MarketFace
+from nonebot_plugin_alconna.uniseg import Image, UniMsg, image_fetch
+from nonebot_plugin_uninfo import Uninfo
+from PIL import Image as PilImage
+
+from .config import config
+from .model import check_image
+from .recall import recall
+
+T = TypeVar("T")
 
 
-logger = logging.getLogger(__name__)
-async def download_image(url: str) -> np.ndarray:
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url)
-        if response.status_code == 200:
-            image_data = response.content
+def transform_image(image_data: bytes) -> np.ndarray:
+    image = PilImage.open(io.BytesIO(image_data))
 
-            # 将字节数据加载为Pillow图像对象
-            image = Image.open(io.BytesIO(image_data))
+    if (
+        # image.format == "GIF" and
+        getattr(image, "is_animated", False)
+    ):
+        # 处理动图：仅获取第一帧
+        image = image.convert("RGB")
+        image = image.copy()  # 获取第一帧
+    else:
+        image = image.convert("RGB")
 
-            # 检查图像格式并处理
-            if image.format == 'GIF' and hasattr(image, 'is_animated') and image.is_animated:
-                # 处理GIF动图：仅获取第一帧
-                image = image.convert("RGB")
-                image = image.copy()  # 获取第一帧
-            else:
-                # 对于非GIF图像（如JPEG）
-                image = image.convert("RGB")
+    image_array = np.array(image)
+    # OpenCV通常使用BGR格式，因此需要转换
+    if len(image_array.shape) == 3 and image_array.shape[2] == 3:
+        image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
 
-            # 将Pillow图像转换为NumPy数组
-            image_array = np.array(image)
-
-            # OpenCV通常使用BGR格式，因此需要转换
-            if len(image_array.shape) == 3 and image_array.shape[2] == 3:
-                image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
-
-            return image_array
+    return image_array
 
 
-
-async def group_message_contains_image(event: MessageEvent) -> bool:
-    if isinstance(event, GroupMessageEvent) and any(seg.type == 'image' or seg.type=='mface' for seg in event.message):
-        return True
-    return False
+def judge_list(lst: Iterable[T], val: T, blacklist: bool) -> bool:
+    return (val not in lst) if blacklist else (val in lst)
 
 
-nailong =on_message(rule=Rule(group_message_contains_image))
+async def nailong_rule(
+    bot: BaseBot,
+    event: BaseEvent,
+    ss_info: Uninfo,
+    msg: UniMsg,
+) -> bool:
+    return (
+        bool(ss_info.member)  # 检查是否是群聊消息，此值仅在群聊与频道中存在
+        and (
+            # bypass superuser
+            (not await SUPERUSER(bot, event))
+            # bypass group admin
+            or ((not ss_info.member.role) or ss_info.member.role.level <= 1)
+        )
+        and ((Image in msg) or (MarketFace in msg))  # msg has image
+        and judge_list(
+            config.nailong_list_scenes,
+            ss_info.scene_path,
+            config.nailong_blacklist,
+        )
+    )
+
+
+nailong = on_message(rule=Rule(nailong_rule))
+
+
 @nailong.handle()
-async def handle_function(bot: Bot, event: GroupMessageEvent):
-    group_id = event.group_id
-    member_info = await bot.get_group_member_info(group_id=group_id, user_id=event.self_id)  # 管理员检测
-    if member_info['role'] != 'admin' and member_info['role'] != 'owner':
-        return
-    for seg in event.message:
-        if seg.type == 'image' or seg.type == 'mface':
+async def handle_function(
+    m: Matcher,
+    bot: BaseBot,
+    ev: BaseEvent,
+    msg: UniMsg,
+    state: T_State,
+):
+    for seg in msg:
+        if isinstance(seg, Image):
+            image = await image_fetch(ev, bot, state, seg)
+            if not image:
+                logger.warning(f"Failed to fetch image: {seg!r}")
+                continue
+
+        elif isinstance(seg, MarketFace):
+            url = f"https://gxh.vip.qq.com/club/item/parcel/item/{seg.id[:2]}/{seg.id}/raw300.gif"
+            req = Request("GET", url)
             try:
-                image_url = seg.data['url']
-                image = await download_image(image_url)
-                if check_image(image):
-                    await bot.call_api('delete_msg', message_id=event.message_id)
-                    await bot.send(event, "本群禁止发送奶龙！")
-                    logger.info(f"撤回了包含奶龙的图片并发送警告：{image_url}")
-                else:
-                    logger.debug("Image does not contain monkey.")
+                resp = await bot.adapter.request(req)
             except Exception as e:
-                logger.error(f"处理图片时出错：{e}")
+                logger.warning(f"Failed to fetch {seg!r}: {type(e).__name__}: {e}")
+                continue
+            image = cast(bytes, resp.content)
+
+        else:
+            continue
+
+        try:
+            ok = await run_sync(check_image)(
+                await run_sync(transform_image)(image),
+            )
+        except Exception:
+            logger.exception(f"Failed to process image: {seg!r}")
+            continue
+
+        if ok:
+            logger.info(f"尝试撤回包含奶龙的图片并发送警告：{seg!r}")
+            await m.send("本群禁止发送奶龙！")
+            try:
+                await recall(bot, ev)
+            except Exception as e:
+                logger.warning(f"{type(e).__name__}: {e}")
+            await m.finish()
