@@ -33,9 +33,11 @@ nb plugin install nonebot_plugin_nailongremove
 pip install nonebot_plugin_nailongremove
 ```
 ## 其他
-- 人工智能学习交流群：949992679
+- 人工智能学习交流群：949992679<span style="color: yellow;">（开源代码，数据集，从本群获取）</span>
 
-- 机器人插件学习交流群：200980266
+
+- 机器人插件学习交流群：200980266<span style="color: yellow;">（机器人及插件安装包，从本群获取）</span>
+
 
 欢迎大家进群一起学习交流~
 ## 许可证
