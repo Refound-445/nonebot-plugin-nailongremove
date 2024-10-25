@@ -12,7 +12,7 @@ from nonebot.rule import Rule
 from nonebot.typing import T_State
 from nonebot.utils import run_sync
 from nonebot_plugin_alconna.builtins.uniseg.market_face import MarketFace
-from nonebot_plugin_alconna.uniseg import Image, UniMsg, image_fetch
+from nonebot_plugin_alconna.uniseg import Image, UniMessage, UniMsg, image_fetch
 from nonebot_plugin_uninfo import Uninfo
 from PIL import Image as PilImage
 
@@ -51,21 +51,21 @@ def judge_list(lst: Iterable[T], val: T, blacklist: bool) -> bool:
 async def nailong_rule(
     bot: BaseBot,
     event: BaseEvent,
-    ss_info: Uninfo,
+    session: Uninfo,
     msg: UniMsg,
 ) -> bool:
     return (
-        bool(ss_info.member)  # 检查是否是群聊消息，此值仅在群聊与频道中存在
+        bool(session.member)  # 检查是否是群聊消息，此值仅在群聊与频道中存在
         and (
             # bypass superuser
             (not await SUPERUSER(bot, event))
             # bypass group admin
-            or ((not ss_info.member.role) or ss_info.member.role.level <= 1)
+            or ((not session.member.role) or session.member.role.level <= 1)
         )
         and ((Image in msg) or (MarketFace in msg))  # msg has image
-        and judge_list(
+        and judge_list(  # 黑白名单
             config.nailong_list_scenes,
-            ss_info.scene_path,
+            session.scene_path,
             config.nailong_blacklist,
         )
     )
@@ -80,6 +80,7 @@ async def handle_function(
     bot: BaseBot,
     ev: BaseEvent,
     msg: UniMsg,
+    session: Uninfo,
     state: T_State,
 ):
     for seg in msg:
@@ -112,9 +113,14 @@ async def handle_function(
 
         if ok:
             logger.info(f"尝试撤回包含奶龙的图片并发送警告：{seg!r}")
-            await m.send("本群禁止发送奶龙！")
-            try:
-                await recall(bot, ev)
-            except Exception as e:
-                logger.warning(f"{type(e).__name__}: {e}")
+            await (
+                UniMessage.template(config.nailong_tip)
+                .format(ev=ev, msg=msg, session=session)
+                .send()
+            )
+            if config.nailong_recall:
+                try:
+                    await recall(bot, ev)
+                except Exception as e:
+                    logger.warning(f"{type(e).__name__}: {e}")
             await m.finish()

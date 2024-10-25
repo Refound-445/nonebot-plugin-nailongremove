@@ -11,6 +11,8 @@ class Config(BaseModel):
     )
     nailong_list_scenes: List[str] = Field(default_factory=list)
     nailong_blacklist: bool = True
+    nailong_recall: bool = True
+    nailong_tip: str = "本群禁止发送奶龙！"
 
 
 config = get_plugin_config(Config)
