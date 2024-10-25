@@ -1,15 +1,10 @@
-# ruff: noqa: E402
 
-from nonebot import get_plugin_config, require
-from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+from nonebot.plugin import PluginMetadata
 
-require("nonebot_plugin_alconna")
-require("nonebot_plugin_uninfo")
-
-from . import handler as handler
 from .config import Config
+from nonebot import get_plugin_config
+from .handler import *
 
-__version__ = "2.0.0"
 __plugin_meta__ = PluginMetadata(
     name="自动撤回奶龙",
     description="一个基于图像分类模型的简单插件~",
@@ -17,9 +12,8 @@ __plugin_meta__ = PluginMetadata(
     type="application",
     homepage="https://github.com/Refound-445/onoebot-plugin-nailongremove",
     config=Config,
-    supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_alconna",
-        "nonebot_plugin_uninfo",
-    ),
+    supported_adapters={"~onebot.v11"},
 )
 config = get_plugin_config(Config)
+
+
