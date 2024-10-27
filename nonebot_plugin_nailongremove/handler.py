@@ -6,14 +6,13 @@ import numpy as np
 from nonebot import logger, on_message
 from nonebot.adapters import Bot as BaseBot, Event as BaseEvent
 from nonebot.drivers import Request
-from nonebot.matcher import Matcher
 from nonebot.permission import SUPERUSER
 from nonebot.rule import Rule
 from nonebot.typing import T_State
 from nonebot.utils import run_sync
 from nonebot_plugin_alconna.builtins.uniseg.market_face import MarketFace
 from nonebot_plugin_alconna.uniseg import Image, UniMessage, UniMsg, image_fetch
-from nonebot_plugin_uninfo import Uninfo
+from nonebot_plugin_uninfo import QryItrface, Uninfo
 from PIL import Image as PilImage
 
 from .config import config
@@ -52,21 +51,44 @@ async def nailong_rule(
     bot: BaseBot,
     event: BaseEvent,
     session: Uninfo,
+    ss_interface: QryItrface,
     msg: UniMsg,
 ) -> bool:
     return (
-        bool(session.member)  # 检查是否是群聊消息，此值仅在群聊与频道中存在
+        # check if it's a group chat
+        bool(session.member)  # this prop only exists in group chats
+        # bypass
         and (
             # bypass superuser
-            (not await SUPERUSER(bot, event))
+            ((not config.nailong_bypass_superuser) or (not await SUPERUSER(bot, event)))
             # bypass group admin
-            or ((not session.member.role) or session.member.role.level <= 1)
+            or (
+                (not config.nailong_bypass_admin)
+                or ((not session.member.role) or session.member.role.level <= 1)
+            )
         )
-        and ((Image in msg) or (MarketFace in msg))  # msg has image
-        and judge_list(  # 黑白名单
+        # msg has image
+        and ((Image in msg) or (MarketFace in msg))
+        # blacklist or whitelist
+        and judge_list(
             config.nailong_list_scenes,
             session.scene_path,
             config.nailong_blacklist,
+        )
+        # self is admin
+        and (
+            (not config.nailong_need_admin)
+            or bool(
+                (
+                    self_info := await ss_interface.get_member(
+                        session.scene.type,
+                        session.scene.id,
+                        user_id=session.self_id,
+                    )
+                )
+                and self_info.role
+                and self_info.role.level >= 1,
+            )
         )
     )
 
@@ -76,7 +98,6 @@ nailong = on_message(rule=Rule(nailong_rule))
 
 @nailong.handle()
 async def handle_function(
-    m: Matcher,
     bot: BaseBot,
     ev: BaseEvent,
     msg: UniMsg,
@@ -111,16 +132,33 @@ async def handle_function(
             logger.exception(f"Failed to process image: {seg!r}")
             continue
 
-        if ok:
-            logger.info(f"尝试撤回包含奶龙的图片并发送警告：{seg!r}")
-            await (
-                UniMessage.template(config.nailong_tip)
-                .format(ev=ev, msg=msg, session=session)
-                .send()
+        if not ok:
+            continue
+
+        # logger.debug(f"尝试撤回包含奶龙的图片并发送警告：{seg!r}")
+        recall_ok = False
+        if config.nailong_recall:
+            try:
+                await recall(bot, ev)
+            except NotImplementedError:
+                pass
+            except Exception as e:
+                logger.warning(f"{type(e).__name__}: {e}")
+            else:
+                recall_ok = True
+
+        await (
+            UniMessage.template(
+                config.nailong_tip if recall_ok else config.nailong_failed_tip,
             )
-            if config.nailong_recall:
-                try:
-                    await recall(bot, ev)
-                except Exception as e:
-                    logger.warning(f"{type(e).__name__}: {e}")
-            await m.finish()
+            .format_map(
+                {
+                    "$event": ev,
+                    "$target": msg.get_target(),
+                    "$message_id": msg.get_message_id(),
+                    "$msg": msg,
+                    "$ss": session,
+                },
+            )
+            .finish()
+        )
