@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:95e4cf8583f9c884010d0321654041e2be2a0996f3f36afb3102853417b822f4"
+content_hash = "sha256:eda6f151d9722ddbc986c73c5debb21599fcc15c819af9d4e75497c1d78673ee"
 
 [[metadata.targets]]
 requires_python = "~=3.9"
@@ -1080,7 +1080,7 @@ files = [
 
 [[package]]
 name = "nonebot-adapter-telegram"
-version = "0.1.0b18"
+version = "0.1.0b19"
 requires_python = "<4.0,>=3.9"
 summary = "Telegram Adapter for NoneBot2"
 groups = ["dev"]
@@ -1090,8 +1090,8 @@ dependencies = [
     "pydantic!=2.5.0,!=2.5.1,<3.0.0,>=2.0.3",
 ]
 files = [
-    {file = "nonebot-adapter-telegram-0.1.0b18.tar.gz", hash = "sha256:233225f4d2fed8d720e10b631a761598dc23e6f51c2d2c4b1181b5f786f9d9db"},
-    {file = "nonebot_adapter_telegram-0.1.0b18-py3-none-any.whl", hash = "sha256:1d0291c677ab8c90a83636955d51d376904fa59e8f6afbb709492443d6e70ba1"},
+    {file = "nonebot-adapter-telegram-0.1.0b19.tar.gz", hash = "sha256:b741027a1b4828d69d2191e880b6e7919a342071e9bac0dcf5db58b44884b33f"},
+    {file = "nonebot_adapter_telegram-0.1.0b19-py3-none-any.whl", hash = "sha256:59d0f63a49487c9558c99709958c9392243c2fb27b8032b830afb63b775f0a54"},
 ]
 
 [[package]]
