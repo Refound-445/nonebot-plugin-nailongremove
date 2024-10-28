@@ -1,5 +1,5 @@
 import io
-from typing import Iterable, TypeVar, cast
+from typing import Any, Awaitable, Callable, Iterable, List, TypeVar, cast
 
 import cv2
 import numpy as np
@@ -17,7 +17,7 @@ from PIL import Image as PilImage
 
 from .config import config
 from .model import check_image
-from .recall import recall
+from .uniapi import mute, recall
 
 T = TypeVar("T")
 
@@ -45,6 +45,21 @@ def transform_image(image_data: bytes) -> np.ndarray:
 
 def judge_list(lst: Iterable[T], val: T, blacklist: bool) -> bool:
     return (val not in lst) if blacklist else (val in lst)
+
+
+async def execute_functions_any_ok(
+    func: Iterable[Callable[[], Awaitable[Any]]],
+) -> bool:
+    ok = False
+    for f in func:
+        try:
+            await f()
+        except Exception as e:
+            logger.warning(f"{type(e).__name__}: {e}")
+            logger.opt(exception=e).debug("Stacktrace:")
+        else:
+            ok = True
+    return ok
 
 
 async def nailong_rule(
@@ -125,32 +140,25 @@ async def handle_function(
             continue
 
         try:
-            ok = await run_sync(check_image)(
+            check_ok = await run_sync(check_image)(
                 await run_sync(transform_image)(image),
             )
         except Exception:
             logger.exception(f"Failed to process image: {seg!r}")
             continue
-
-        if not ok:
+        if not check_ok:
             continue
 
-        # logger.debug(f"尝试撤回包含奶龙的图片并发送警告：{seg!r}")
-        recall_ok = False
+        functions: List[Callable[[], Awaitable[Any]]] = []
         if config.nailong_recall:
-            try:
-                await recall(bot, ev)
-            except NotImplementedError:
-                pass
-            except Exception as e:
-                logger.warning(f"{type(e).__name__}: {e}")
-            else:
-                recall_ok = True
+            functions.append(lambda: recall(bot, ev))
+        if config.nailong_mute_seconds > 0:
+            functions.append(lambda: mute(bot, ev, config.nailong_mute_seconds))
+        punish_ok = (not functions) or (await execute_functions_any_ok(functions))
 
+        template_str = config.nailong_tip if punish_ok else config.nailong_failed_tip
         await (
-            UniMessage.template(
-                config.nailong_tip if recall_ok else config.nailong_failed_tip,
-            )
+            UniMessage.template(template_str)
             .format_map(
                 {
                     "$event": ev,

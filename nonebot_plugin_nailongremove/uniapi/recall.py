@@ -175,7 +175,6 @@ async def tailchat(bot: BaseBot, ev: BaseEvent):
 
 
 async def recall(bot: BaseBot, ev: BaseEvent):
-    f = recall_map.get(bot.adapter.get_name())
-    if f:
+    if f := recall_map.get(bot.adapter.get_name()):
         return await f(bot, ev)
     raise NotImplementedError
