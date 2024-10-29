@@ -176,7 +176,7 @@ async def handle_function(
             functions.append(lambda: recall(bot, ev))
         if config.nailong_mute_seconds > 0:
             functions.append(lambda: mute(bot, ev, config.nailong_mute_seconds))
-        punish_ok = (not functions) or (await execute_functions_any_ok(functions))
+        punish_ok = functions and (await execute_functions_any_ok(functions))
 
         template_str = config.nailong_tip if punish_ok else config.nailong_failed_tip
         await (
