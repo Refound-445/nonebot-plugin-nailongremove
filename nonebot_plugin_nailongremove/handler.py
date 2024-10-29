@@ -67,15 +67,12 @@ async def nailong_rule(
     return (
         # check if it's a group chat
         bool(session.member)  # this prop only exists in group chats
-        # bypass
+        # bypass superuser
+        and ((not config.nailong_bypass_superuser) or (not await SUPERUSER(bot, event)))
+        # bypass group admin
         and (
-            # bypass superuser
-            ((not config.nailong_bypass_superuser) or (not await SUPERUSER(bot, event)))
-            # bypass group admin
-            or (
-                (not config.nailong_bypass_admin)
-                or ((not session.member.role) or session.member.role.level <= 1)
-            )
+            (not config.nailong_bypass_admin)
+            or ((not session.member.role) or session.member.role.level <= 1)
         )
         # msg has image
         and ((Image in msg) or (MarketFace in msg))
