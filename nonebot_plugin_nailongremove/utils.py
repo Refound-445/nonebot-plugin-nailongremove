@@ -16,12 +16,13 @@ def ensure_model(model_filename: str):
 
     def get_model_version():
         url = f"{MODEL_BASE_URL}/{model_version_filename}"
-        return httpx.get(url).raise_for_status().text.strip()
+        return httpx.get(url, follow_redirects=True).raise_for_status().text.strip()
 
     try:
         ver = get_model_version()
     except Exception:
-        logger.error(f"Failed to get model version of {model_filename}")
+        logger.warning(f"Failed to get model version of {model_filename}")
+        logger.exception("Stacktrace")
         ver = None
 
     local_ver = (
