@@ -36,7 +36,7 @@ def ensure_model(model_filename: str):
         logger.warning("Skip update.")
         return model_path
 
-    if (not model_exists) or local_ver != ver:
+    if ((not model_exists) or local_ver != ver) and config.auto_update:
         logger.info(
             f"Updating model {model_filename} "
             f"from version {local_ver or 'Unknown'} to version {ver or 'Unknown'}",

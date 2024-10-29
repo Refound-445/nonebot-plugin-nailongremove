@@ -127,21 +127,23 @@ plugins = [
 
 在 nonebot2 项目的 `.env` 文件中添加下表中的必填配置
 
-|           配置项           | 必填 |                      默认值                       |                                                                               说明                                                                                |
-| :------------------------: | :--: | :-----------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-|    `NAILONG_MODEL_DIR`     |  否  |              `./data/nailongremove`               |                                                                          模型的下载位置                                                                           |
-| `NAILONG_BYPASS_SUPERUSER` |  否  |                      `True`                       |                                                                   是否不检查超级用户发送的图片                                                                    |
-|   `NAILONG_BYPASS_ADMIN`   |  否  |                      `True`                       |                                                                  是否不检查群组管理员发送的图片                                                                   |
-|    `NAILONG_NEED_ADMIN`    |  否  |                      `False`                      |                                                           当自身不为群组管理员时是否不检查群内所有图片                                                            |
-|   `NAILONG_LIST_SCENES`    |  否  |                       `[]`                        |           聊天场景 ID 黑白名单列表<br />在单级聊天下为该聊天 ID，如 QQ 群号；<br />在多级聊天下为以 `_` 分割的各级聊天 ID，如频道下的子频道或频道下私聊           |
-|    `NAILONG_BLACKLIST`     |  否  |                      `True`                       |                                                                        是否使用黑名单模式                                                                         |
-|      `NAILONG_RECALL`      |  否  |                      `True`                       |                                                                           是否撤回消息                                                                            |
-|   `NAILONG_MUTE_SECONDS`   |  否  |                        `0`                        |                                                           设置禁言时间，默认为 0 即不禁言<br/>单位：秒                                                            |
-|       `NAILONG_TIP`        |  否  |                `本群禁止发奶龙！`                 | 发送的提示，使用 [Alconna 的消息模板](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E4%BD%BF%E7%94%A8%E6%B6%88%E6%81%AF%E6%A8%A1%E6%9D%BF)，可用变量见下 |
-|    `NAILONG_FAILED_TIP`    |  否  | `{:Reply($message_id)}呜，不要发奶龙了嘛 🥺 👉👈` |                                                               撤回失败或禁用撤回时发送的提示，同上                                                                |
-|      `NAILONG_MODEL`       |  否  |                        `0`                        |                                                                 选择需要加载的模型，可用模型见下                                                                  |
-|   `NAILONG_CONCURRENCY`    |  否  |                        `1`                        |                                                       当图片为动图时，针对该图片并发识别图片帧的最大并发数                                                        |
-|     `NAILONG_PRIORITY`     |  否  |                       `100`                       |                                                                          Matcher 优先级                                                                           |
+|            配置项             | 必填 |                   默认值                    |                                                                      说明                                                                       |
+|:--------------------------:| :--: |:----------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------:|
+|    `NAILONG_MODEL_DIR`     |  否  |          `./data/nailongremove`          |                                                                    模型的下载位置                                                                    |
+| `NAILONG_BYPASS_SUPERUSER` |  否  |                  `True`                  |                                                                是否不检查超级用户发送的图片                                                                 |
+|   `NAILONG_BYPASS_ADMIN`   |  否  |                  `True`                  |                                                                是否不检查群组管理员发送的图片                                                                |
+|    `NAILONG_NEED_ADMIN`    |  否  |                 `False`                  |                                                            当自身不为群组管理员时是否不检查群内所有图片                                                             |
+|   `NAILONG_LIST_SCENES`    |  否  |                   `[]`                   |                            聊天场景 ID 黑白名单列表<br />在单级聊天下为该聊天 ID，如 QQ 群号；<br />在多级聊天下为以 `_` 分割的各级聊天 ID，如频道下的子频道或频道下私聊                             |
+|    `NAILONG_BLACKLIST`     |  否  |                  `True`                  |                                                                   是否使用黑名单模式                                                                   |
+|      `NAILONG_RECALL`      |  否  |                  `True`                  |                                                                    是否撤回消息                                                                     |
+|   `NAILONG_MUTE_SECONDS`   |  否  |                   `0`                    |                                                          设置禁言时间，默认为 0 即不禁言<br/>单位：秒                                                           |
+|       `NAILONG_TIP`        |  否  |                `本群禁止发奶龙！`                | 发送的提示，使用 [Alconna 的消息模板](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E4%BD%BF%E7%94%A8%E6%B6%88%E6%81%AF%E6%A8%A1%E6%9D%BF)，可用变量见下 |
+|    `NAILONG_FAILED_TIP`    |  否  | `{:Reply($message_id)}呜，不要发奶龙了嘛 🥺 👉👈` |                                                              撤回失败或禁用撤回时发送的提示，同上                                                               |
+|      `NAILONG_MODEL`       |  否  |                   `0`                    |                                                               选择需要加载的模型，可用模型见下                                                                |
+|   `NAILONG_CONCURRENCY`    |  否  |                   `1`                    |                                                          当图片为动图时，针对该图片并发识别图片帧的最大并发数                                                           |
+|     `NAILONG_PRIORITY`     |  否  |                  `100`                   |                                                                  Matcher 优先级                                                                  |
+|       `AUTO_UPDATE`        |  否  |                  `True`                  |                                                                  是否自动更新模型权重                                                                   |
+|        `YOLOX_SIZE`        |  否  |               `[416,416]`                |                                                            主要针对模型1，自定义模型输入可能会有尺寸更改                                                            |
 
 ### 可用模型
 
@@ -177,3 +179,4 @@ plugins = [
 - 重构插件，适配多平台
 - 更新了两个新模型，优化了模型精度，用户可自行选择其中之一进行推理
 - 增加了禁言、群黑白名单、可选关闭管理员检测等功能
+- 增加了自动更新模型可选
