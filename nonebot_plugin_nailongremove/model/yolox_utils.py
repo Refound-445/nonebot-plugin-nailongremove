@@ -1,21 +1,12 @@
 #!/usr/bin/env python3
 # Copyright (c) Megvii Inc. All rights reserved.
 
-import os
+# ruff: noqa: ANN001
+
 import random
 
 import cv2
 import numpy as np
-
-__all__ = [
-    "demo_postprocess",
-    "mkdir",
-    "multiclass_nms",
-    "nms",
-    "random_color",
-    "visualize_assign",
-]
-COCO_CLASSES = ("_background_", "nailong", "anime", "human", "emoji", "long", "other")
 
 
 def preprocess(img, input_size, swap=(2, 0, 1)):
@@ -35,47 +26,6 @@ def preprocess(img, input_size, swap=(2, 0, 1)):
     padded_img = padded_img.transpose(swap)
     padded_img = np.ascontiguousarray(padded_img, dtype=np.float32)
     return padded_img, r
-
-
-def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
-    for i in range(len(boxes)):
-        box = boxes[i]
-        cls_id = int(cls_ids[i])
-        score = scores[i]
-        if score < conf:
-            continue
-        x0 = int(box[0])
-        y0 = int(box[1])
-        x1 = int(box[2])
-        y1 = int(box[3])
-
-        color = (_COLORS[cls_id] * 255).astype(np.uint8).tolist()
-        text = "{}:{:.1f}%".format(class_names[cls_id], score * 100)
-        txt_color = (0, 0, 0) if np.mean(_COLORS[cls_id]) > 0.5 else (255, 255, 255)
-        font = cv2.FONT_HERSHEY_SIMPLEX
-
-        txt_size = cv2.getTextSize(text, font, 0.4, 1)[0]
-        cv2.rectangle(img, (x0, y0), (x1, y1), color, 2)
-
-        txt_bk_color = (_COLORS[cls_id] * 255 * 0.7).astype(np.uint8).tolist()
-        cv2.rectangle(
-            img,
-            (x0, y0 + 1),
-            (x0 + txt_size[0] + 1, y0 + int(1.5 * txt_size[1])),
-            txt_bk_color,
-            -1,
-        )
-        cv2.putText(
-            img,
-            text,
-            (x0, y0 + txt_size[1]),
-            font,
-            0.4,
-            txt_color,
-            thickness=1,
-        )
-
-    return img
 
 
 def random_color():
@@ -118,11 +68,6 @@ def visualize_assign(img, boxes, coords, match_results, save_name=None) -> np.nd
         cv2.imwrite(save_name, img)
 
     return img
-
-
-def mkdir(path):
-    if not os.path.exists(path):
-        os.makedirs(path)
 
 
 def nms(boxes, scores, nms_thr):
@@ -201,11 +146,11 @@ def multiclass_nms_class_agnostic(boxes, scores, nms_thr, score_thr):
     valid_cls_inds = cls_inds[valid_score_mask]
     keep = nms(valid_boxes, valid_scores, nms_thr)
     if keep:
-        dets = np.concatenate(
+        return np.concatenate(
             [valid_boxes[keep], valid_scores[keep, None], valid_cls_inds[keep, None]],
             1,
         )
-    return dets
+    return []
 
 
 def demo_postprocess(outputs, img_size, p6=False):

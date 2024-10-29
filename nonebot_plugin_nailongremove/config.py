@@ -5,6 +5,8 @@ from typing import List
 from nonebot import get_plugin_config
 from pydantic import BaseModel, Field
 
+MODEL_BASE_URL = "https://github.com/Refound-445/nonebot-plugin-nailongremove/releases/download/weights"
+
 
 class ModelType(int, Enum):
     CLASSIFICATION = 0
@@ -13,7 +15,7 @@ class ModelType(int, Enum):
 
 class Config(BaseModel):
     nailong_model_dir: Path = Field(
-        default_factory=lambda: Path.cwd(),
+        default_factory=lambda: Path.cwd() / "data" / "nailongremove",
     )
     nailong_bypass_superuser: bool = True
     nailong_bypass_admin: bool = True
