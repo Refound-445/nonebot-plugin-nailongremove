@@ -12,7 +12,7 @@ def ensure_model(model_filename: str):
 
     def download():
         url = f"{MODEL_BASE_URL}/{model_filename}"
-        torch.hub.download_url_to_file(url, model_filename, progress=True)
+        torch.hub.download_url_to_file(url, str(model_path), progress=True)
 
     def get_model_version():
         url = f"{MODEL_BASE_URL}/{model_version_filename}"
