@@ -1,7 +1,7 @@
 [project]
 name = "nonebot-plugin-nailongremove"
-dynamic = ["version"]
-description = "一个基于图像分类模型的撤回图片插件"
+dynamic = ["1.1.8"]
+description = "识别目标并撤回图片插件"
 authors = [{ name = "445", email = "2877834692@qq.com" }]
 requires-python = "<4.0,>=3.9"
 dependencies = [
@@ -14,6 +14,7 @@ dependencies = [
     "torchvision>=0.19",
     "nonebot-plugin-alconna>=0.53.1",
     "nonebot-plugin-uninfo>=0.5.0",
+    "onnxruntime>=1.19",
 ]
 license = { text = "MIT" }
 readme = "README.md"
