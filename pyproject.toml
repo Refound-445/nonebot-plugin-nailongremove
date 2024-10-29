@@ -2,7 +2,10 @@
 name = "nonebot-plugin-nailongremove"
 dynamic = ["version"]
 description = "识别目标并撤回图片插件"
-authors = [{ name = "445", email = "2877834692@qq.com" }]
+authors = [
+    { name = "445", email = "2877834692@qq.com" },
+    { name = "student_2333", email = "lgc2333@126.com" }
+]
 requires-python = "<4.0,>=3.9"
 dependencies = [
     "nonebot2>=2.2.0",
