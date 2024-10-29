@@ -82,6 +82,8 @@ def ensure_model(
         return model_path
 
     def download():
+        if not config.nailong_model_dir.exists():
+            config.nailong_model_dir.mkdir(parents=True)
         url = f"{model_base_url}/{model_filename}"
         torch.hub.download_url_to_file(url, str(model_path), progress=True)
 
