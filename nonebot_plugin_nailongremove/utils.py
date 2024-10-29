@@ -22,22 +22,29 @@ def ensure_model(model_filename: str):
         ver = get_model_version()
     except Exception:
         logger.error(f"Failed to get model version of {model_filename}")
-        raise
+        ver = None
 
     local_ver = (
         model_version_path.read_text(encoding="u8").strip()
         if model_version_path.exists()
         else None
     )
-    if (not model_path.exists()) or (ver != local_ver):
+    model_exists = model_path.exists()
+
+    if model_exists and (ver is None):
+        logger.warning("Skip update.")
+        return model_path
+
+    if (not model_exists) or local_ver != ver:
         logger.info(
             f"Updating model {model_filename} "
-            f"from version {local_ver or 'Unknown'} to version {ver}",
+            f"from version {local_ver or 'Unknown'} to version {ver or 'Unknown'}",
         )
         if (not model_version_path.exists()) or (
             ver != model_version_path.read_text().strip()
         ):
             download()
-            model_version_path.write_text(ver, encoding="u8")
+            if ver:
+                model_version_path.write_text(ver, encoding="u8")
 
     return model_path
