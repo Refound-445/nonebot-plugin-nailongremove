@@ -40,11 +40,8 @@ def ensure_model(model_filename: str):
             f"Updating model {model_filename} "
             f"from version {local_ver or 'Unknown'} to version {ver or 'Unknown'}",
         )
-        if (not model_version_path.exists()) or (
-            ver != model_version_path.read_text().strip()
-        ):
-            download()
-            if ver:
-                model_version_path.write_text(ver, encoding="u8")
+        download()
+        if ver:
+            model_version_path.write_text(ver, encoding="u8")
 
     return model_path
