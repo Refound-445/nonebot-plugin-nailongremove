@@ -101,13 +101,14 @@ def ensure_model(
     if ver is None:
         logger.warning("Skip update.")
     elif local_ver != ver:
+        local_ver_display = (
+            f" from version {local_ver or 'Unknown'}" if model_exists else ""
+        )
         logger.info(
-            f"Updating model {model_filename} "
-            f"from version {local_ver or 'Unknown'} to version {ver}",
+            f"Updating model {model_filename}{local_ver_display} to version {ver}",
         )
         download()
-        if ver:
-            model_version_path.write_text(ver, encoding="u8")
+        model_version_path.write_text(ver, encoding="u8")
 
     return model_path
 
