@@ -140,6 +140,8 @@ plugins = [
 |       `NAILONG_TIP`        |  否  |                `本群禁止发奶龙！`                 | 发送的提示，使用 [Alconna 的消息模板](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E4%BD%BF%E7%94%A8%E6%B6%88%E6%81%AF%E6%A8%A1%E6%9D%BF)，可用变量见下 |
 |    `NAILONG_FAILED_TIP`    |  否  | `{:Reply($message_id)}呜，不要发奶龙了嘛 🥺 👉👈` |                                                               撤回失败或禁用撤回时发送的提示，同上                                                                |
 |      `NAILONG_MODEL`       |  否  |                        `0`                        |                                                                 选择需要加载的模型，可用模型见下                                                                  |
+|   `NAILONG_CONCURRENCY`    |  否  |                        `1`                        |                                                       当图片为动图时，针对该图片并发识别图片帧的最大并发数                                                        |
+|     `NAILONG_PRIORITY`     |  否  |                       `100`                       |                                                                          Matcher 优先级                                                                           |
 
 ### 可用模型
 

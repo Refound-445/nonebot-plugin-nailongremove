@@ -27,7 +27,8 @@ class Config(BaseModel):
     nailong_tip: str = "本群禁止发送奶龙！"
     nailong_failed_tip: str = "{:Reply($message_id)}呜，不要发奶龙了嘛 🥺 👉👈"
     nailong_model: ModelType = ModelType.CLASSIFICATION
-    nailong_concurrency: int = 4
+    nailong_concurrency: int = 1
+    nailong_priority: int = 100
 
 
 config = get_plugin_config(Config)

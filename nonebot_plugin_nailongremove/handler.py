@@ -140,7 +140,7 @@ async def check_frames(frames: Iterator[np.ndarray]) -> bool:
     return await wait_result()
 
 
-nailong = on_message(rule=Rule(nailong_rule))
+nailong = on_message(rule=Rule(nailong_rule), priority=config.nailong_priority)
 
 
 @nailong.handle()
