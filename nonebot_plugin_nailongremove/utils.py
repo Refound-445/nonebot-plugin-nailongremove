@@ -95,7 +95,7 @@ def ensure_model(
             f"{type(e).__name__}: {e}",
         )
         if model_exists:
-            logger.exception("Stacktrace")
+            logger.opt(exception=e).debug("Stacktrace")
         else:
             raise
         ver = None

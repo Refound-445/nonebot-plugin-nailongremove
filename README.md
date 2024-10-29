@@ -153,13 +153,14 @@ plugins = [
 
 ### 消息模板可用变量
 
-| 变量名        | 类型                                                                                                                         | 说明     |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------- |
-| `$event`      | [`Event`](https://nonebot.dev/docs/api/adapters/#Event)                                                                      | 当前事件 |
-| `$target`     | [`Target`](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E6%B6%88%E6%81%AF%E5%8F%91%E9%80%81%E5%AF%B9%E8%B1%A1)     | 事件目标 |
-| `$message_id` | `str`                                                                                                                        | 消息 ID  |
-| `$msg`        | [`UniMessage`](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E9%80%9A%E7%94%A8%E6%B6%88%E6%81%AF%E5%BA%8F%E5%88%97) | 当前消息 |
-| `$ss`         | [`Session`](https://github.com/RF-Tar-Railt/nonebot-plugin-uninfo?tab=readme-ov-file#session)                                | 当前会话 |
+| 变量名           | 类型                                                                                                                         | 说明                                              |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `$event`         | [`Event`](https://nonebot.dev/docs/api/adapters/#Event)                                                                      | 当前事件                                          |
+| `$target`        | [`Target`](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E6%B6%88%E6%81%AF%E5%8F%91%E9%80%81%E5%AF%B9%E8%B1%A1)     | 事件目标                                          |
+| `$message_id`    | `str`                                                                                                                        | 消息 ID                                           |
+| `$msg`           | [`UniMessage`](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E9%80%9A%E7%94%A8%E6%B6%88%E6%81%AF%E5%BA%8F%E5%88%97) | 当前消息                                          |
+| `$ss`            | [`Session`](https://github.com/RF-Tar-Railt/nonebot-plugin-uninfo?tab=readme-ov-file#session)                                | 当前会话                                          |
+| `$checked_image` | `bytes`                                                                                                                      | 框选出对应目标后的图片，仅在模型配置为 `1` 时存在 |
 
 ## 🎉 使用
 
@@ -174,6 +175,10 @@ plugins = [
 欢迎大家进群一起学习交流~
 
 ## 📝 更新日志
+
+### 2.1.1
+
+- 新增变量 `$checked_image`
 
 ### 2.1.0
 

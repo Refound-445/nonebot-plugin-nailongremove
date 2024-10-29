@@ -30,7 +30,7 @@ if cuda_available:
     model.cuda()
 
 
-def check_image(image: np.ndarray) -> bool:
+def check_image(image: np.ndarray):
     if image.shape[0] < 224 or image.shape[1] < 224:
         return False
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)

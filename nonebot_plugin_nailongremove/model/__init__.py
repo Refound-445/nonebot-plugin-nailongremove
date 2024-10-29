@@ -1,5 +1,6 @@
-from typing import NoReturn
+from typing import Callable, NoReturn, Tuple, Union
 
+import numpy as np
 from nonebot.utils import run_sync
 
 from ..config import ModelType, config
@@ -12,6 +13,8 @@ def raise_extra_import_error(e: BaseException, group: str) -> NoReturn:
         f"in your project's environment to install.",
     ) from e
 
+
+check_image_sync: Callable[[np.ndarray], Union[bool, Tuple[bool, np.ndarray]]]
 
 if config.nailong_model is ModelType.CLASSIFICATION:
     from .classification import check_image as check_image_sync

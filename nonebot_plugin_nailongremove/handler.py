@@ -1,7 +1,18 @@
 import asyncio
 import io
 from asyncio import Semaphore
-from typing import Any, Awaitable, Callable, Iterable, Iterator, List, TypeVar, cast
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    TypeVar,
+    cast,
+)
 
 import cv2
 import numpy as np
@@ -104,8 +115,10 @@ async def nailong_rule(
     )
 
 
-async def check_frames(frames: Iterator[np.ndarray]) -> bool:
-    signal = asyncio.Future[bool]()
+async def check_frames(
+    frames: Iterator[np.ndarray],
+) -> Tuple[bool, Optional[np.ndarray]]:
+    signal = asyncio.Future[Tuple[bool, Optional[np.ndarray]]]()
     sem = Semaphore(config.nailong_concurrency)
 
     async def task(f: np.ndarray):
@@ -115,6 +128,8 @@ async def check_frames(frames: Iterator[np.ndarray]) -> bool:
         except Exception as e:
             signal.set_exception(e)
         else:
+            if isinstance(ok, bool):
+                ok = (ok, None)
             signal.set_result(ok)
 
     async def wait_result():
@@ -125,7 +140,7 @@ async def check_frames(frames: Iterator[np.ndarray]) -> bool:
 
     for f in frames:
         if (sem.locked() or signal.done()) and (await wait_result()):
-            return True
+            return True, None
         asyncio.create_task(task(f))
 
     return await wait_result()
@@ -164,7 +179,7 @@ async def handle_function(
 
         try:
             frames = transform_image(image)
-            check_ok = await check_frames(frames)
+            check_ok, checked_image = await check_frames(frames)
         except Exception:
             logger.exception(f"Failed to process image: {seg!r}")
             continue
@@ -179,16 +194,16 @@ async def handle_function(
         punish_ok = functions and (await execute_functions_any_ok(functions))
 
         template_str = config.nailong_tip if punish_ok else config.nailong_failed_tip
-        await (
-            UniMessage.template(template_str)
-            .format_map(
-                {
-                    "$event": ev,
-                    "$target": msg.get_target(),
-                    "$message_id": msg.get_message_id(),
-                    "$msg": msg,
-                    "$ss": session,
-                },
-            )
-            .finish()
-        )
+        mapping = {
+            "$event": ev,
+            "$target": msg.get_target(),
+            "$message_id": msg.get_message_id(),
+            "$msg": msg,
+            "$ss": session,
+        }
+        if checked_image is not None:
+            bio = io.BytesIO()
+            img = PilImage.fromarray(checked_image)
+            img.save(bio, "PNG")
+            mapping["$checked_image"] = bio.getvalue()
+        await UniMessage.template(template_str).format_map(mapping).finish()

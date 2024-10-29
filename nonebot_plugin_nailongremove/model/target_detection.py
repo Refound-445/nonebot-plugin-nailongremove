@@ -3,7 +3,7 @@ import onnxruntime
 
 from ..config import config
 from ..utils import ensure_model_from_github_release
-from .yolox_utils import demo_postprocess, multiclass_nms, preprocess
+from .yolox_utils import demo_postprocess, multiclass_nms, preprocess, vis
 
 COCO_CLASSES = ("_background_", "nailong", "anime", "human", "emoji", "long", "other")
 
@@ -18,7 +18,7 @@ session = onnxruntime.InferenceSession(model_path)
 input_shape = config.nailong_yolox_size
 
 
-def check_image(image: np.ndarray) -> bool:
+def check_image(image: np.ndarray):
     img, ratio = preprocess(image, input_shape)
     ort_inputs = {session.get_inputs()[0].name: img[None, :, :, :]}
     output = session.run(None, ort_inputs)
@@ -35,20 +35,21 @@ def check_image(image: np.ndarray) -> bool:
     boxes_xyxy /= ratio
     dets = multiclass_nms(boxes_xyxy, scores, nms_thr=0.45, score_thr=0.1)
     if dets is not None:
-        _final_boxes, final_scores, final_cls_inds = (
+        final_boxes, final_scores, final_cls_inds = (
             dets[:, :4],  # type: ignore
             dets[:, 4],  # type: ignore
             dets[:, 5],  # type: ignore
         )
-        # image = vis(
-        #     image,
-        #     final_boxes,
-        #     final_scores,
-        #     final_cls_inds,
-        #     conf=0.3,
-        #     class_names=COCO_CLASSES,
-        # )
+
         for i in range(len(final_scores)):
             if final_cls_inds[i] == 1 and final_scores[i] > 0.5:
-                return True
+                image = vis(
+                    image,
+                    final_boxes,
+                    final_scores,
+                    final_cls_inds,
+                    conf=0.3,
+                    class_names=COCO_CLASSES,
+                )
+                return True, image
     return False
