@@ -10,6 +10,16 @@ def ensure_model(model_filename: str):
     model_path = config.nailong_model_dir / model_filename
     model_version_path = config.nailong_model_dir / model_version_filename
 
+    model_exists = model_path.exists()
+    local_ver = (
+        model_version_path.read_text(encoding="u8").strip()
+        if model_exists and model_version_path.exists()
+        else None
+    )
+
+    if model_exists and (not config.nailong_auto_update_model):
+        return model_path
+
     def download():
         url = f"{MODEL_BASE_URL}/{model_filename}"
         torch.hub.download_url_to_file(url, str(model_path), progress=True)
@@ -25,18 +35,11 @@ def ensure_model(model_filename: str):
         logger.exception("Stacktrace")
         ver = None
 
-    model_exists = model_path.exists()
-    local_ver = (
-        model_version_path.read_text(encoding="u8").strip()
-        if model_exists and model_version_path.exists()
-        else None
-    )
-
     if model_exists and (ver is None):
         logger.warning("Skip update.")
         return model_path
 
-    if ((not model_exists) or local_ver != ver) and config.auto_update:
+    if (not model_exists) or local_ver != ver:
         logger.info(
             f"Updating model {model_filename} "
             f"from version {local_ver or 'Unknown'} to version {ver or 'Unknown'}",
