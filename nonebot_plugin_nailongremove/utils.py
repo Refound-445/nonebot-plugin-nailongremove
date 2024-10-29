@@ -25,12 +25,12 @@ def ensure_model(model_filename: str):
         logger.exception("Stacktrace")
         ver = None
 
+    model_exists = model_path.exists()
     local_ver = (
         model_version_path.read_text(encoding="u8").strip()
-        if model_version_path.exists()
+        if model_exists and model_version_path.exists()
         else None
     )
-    model_exists = model_path.exists()
 
     if model_exists and (ver is None):
         logger.warning("Skip update.")
