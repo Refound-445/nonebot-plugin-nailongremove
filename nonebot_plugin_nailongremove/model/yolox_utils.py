@@ -3,8 +3,6 @@
 
 # ruff: noqa: ANN001
 
-import random
-
 import cv2
 import numpy as np
 
@@ -26,48 +24,6 @@ def preprocess(img, input_size, swap=(2, 0, 1)):
     padded_img = padded_img.transpose(swap)
     padded_img = np.ascontiguousarray(padded_img, dtype=np.float32)
     return padded_img, r
-
-
-def random_color():
-    return random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
-
-
-def visualize_assign(img, boxes, coords, match_results, save_name=None) -> np.ndarray:
-    """visualize label assign result.
-
-    Args:
-        img: img to visualize
-        boxes: gt boxes in xyxy format
-        coords: coords of matched anchors
-        match_results: match results of each gt box and coord.
-        save_name: name of save image, if None, image will not be saved. Default: None.
-    """
-    for box_id, box in enumerate(boxes):
-        x1, y1, x2, y2 = box
-        color = random_color()
-        assign_coords = coords[match_results == box_id]
-        if assign_coords.numel() == 0:
-            # unmatched boxes are red
-            color = (0, 0, 255)
-            cv2.putText(
-                img,
-                "unmatched",
-                (int(x1), int(y1) - 5),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.6,
-                color,
-                1,
-            )
-        else:
-            for coord in assign_coords:
-                # draw assigned anchor
-                cv2.circle(img, (int(coord[0]), int(coord[1])), 3, color, -1)
-        cv2.rectangle(img, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
-
-    if save_name is not None:
-        cv2.imwrite(save_name, img)
-
-    return img
 
 
 def nms(boxes, scores, nms_thr):
@@ -174,112 +130,3 @@ def demo_postprocess(outputs, img_size, p6=False):
     outputs[..., 2:4] = np.exp(outputs[..., 2:4]) * expanded_strides
 
     return outputs
-
-
-_COLORS = (
-    np.array(
-        [
-            0.000, 0.447, 0.741,
-            0.850, 0.325, 0.098,
-            0.929, 0.694, 0.125,
-            0.494, 0.184, 0.556,
-            0.466, 0.674, 0.188,
-            0.301, 0.745, 0.933,
-            0.635, 0.078, 0.184,
-            0.300, 0.300, 0.300,
-            0.600, 0.600, 0.600,
-            1.000, 0.000, 0.000,
-            1.000, 0.500, 0.000,
-            0.749, 0.749, 0.000,
-            0.000, 1.000, 0.000,
-            0.000, 0.000, 1.000,
-            0.667, 0.000, 1.000,
-            0.333, 0.333, 0.000,
-            0.333, 0.667, 0.000,
-            0.333, 1.000, 0.000,
-            0.667, 0.333, 0.000,
-            0.667, 0.667, 0.000,
-            0.667, 1.000, 0.000,
-            1.000, 0.333, 0.000,
-            1.000, 0.667, 0.000,
-            1.000, 1.000, 0.000,
-            0.000, 0.333, 0.500,
-            0.000, 0.667, 0.500,
-            0.000, 1.000, 0.500,
-            0.333, 0.000, 0.500,
-            0.333, 0.333, 0.500,
-            0.333, 0.667, 0.500,
-            0.333, 1.000, 0.500,
-            0.667, 0.000, 0.500,
-            0.667, 0.333, 0.500,
-            0.667, 0.667, 0.500,
-            0.667, 1.000, 0.500,
-            1.000, 0.000, 0.500,
-            1.000, 0.333, 0.500,
-            1.000, 0.667, 0.500,
-            1.000, 1.000, 0.500,
-            0.000, 0.333, 1.000,
-            0.000, 0.667, 1.000,
-            0.000, 1.000, 1.000,
-            0.333, 0.000, 1.000,
-            0.333, 0.333, 1.000,
-            0.333, 0.667, 1.000,
-            0.333, 1.000, 1.000,
-            0.667, 0.000, 1.000,
-            0.667, 0.333, 1.000,
-            0.667, 0.667, 1.000,
-            0.667, 1.000, 1.000,
-            1.000, 0.000, 1.000,
-            1.000, 0.333, 1.000,
-            1.000, 0.667, 1.000,
-            0.333, 0.000, 0.000,
-            0.500, 0.000, 0.000,
-            0.667, 0.000, 0.000,
-            0.833, 0.000, 0.000,
-            1.000, 0.000, 0.000,
-            0.000, 0.167, 0.000,
-            0.000, 0.333, 0.000,
-            0.000, 0.500, 0.000,
-            0.000, 0.667, 0.000,
-            0.000, 0.833, 0.000,
-            0.000, 1.000, 0.000,
-            0.000, 0.000, 0.167,
-            0.000, 0.000, 0.333,
-            0.000, 0.000, 0.500,
-            0.000, 0.000, 0.667,
-            0.000, 0.000, 0.833,
-            0.000, 0.000, 1.000,
-            0.000, 0.000, 0.000,
-            0.143, 0.143, 0.143,
-            0.286, 0.286, 0.286,
-            0.429, 0.429, 0.429,
-            0.571, 0.571, 0.571,
-            0.714, 0.714, 0.714,
-            0.857, 0.857, 0.857,
-            0.000, 0.447, 0.741,
-            0.314, 0.717, 0.741,
-            0.50, 0.5, 0,
-        ],
-    )
-    .astype(np.float32)
-    .reshape(-1, 3) 
-)  # fmt: skip
-
-
-def preproc(img, input_size, swap=(2, 0, 1)):
-    if len(img.shape) == 3:
-        padded_img = np.ones((input_size[0], input_size[1], 3), dtype=np.uint8) * 114
-    else:
-        padded_img = np.ones(input_size, dtype=np.uint8) * 114
-
-    r = min(input_size[0] / img.shape[0], input_size[1] / img.shape[1])
-    resized_img = cv2.resize(
-        img,
-        (int(img.shape[1] * r), int(img.shape[0] * r)),
-        interpolation=cv2.INTER_LINEAR,
-    ).astype(np.uint8)
-    padded_img[: int(img.shape[0] * r), : int(img.shape[1] * r)] = resized_img
-
-    padded_img = padded_img.transpose(swap)
-    padded_img = np.ascontiguousarray(padded_img, dtype=np.float32)
-    return padded_img, r
