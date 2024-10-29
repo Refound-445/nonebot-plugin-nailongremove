@@ -1,0 +1,27 @@
+name: Publish Python 🐍 distributions 📦 to PyPI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-n-publish:
+    name: Use PDM to Build and publish Python 🐍 distributions 📦 to PyPI
+    runs-on: ubuntu-latest
+
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+        with:
+          submodules: true
+
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+
+      - name: Build and Publish distribution 📦 to PyPI
+        run: pdm publish
