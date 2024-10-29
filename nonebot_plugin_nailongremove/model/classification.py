@@ -11,6 +11,7 @@ from ..utils import ensure_model
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 transform = transforms.Compose([transforms.ToTensor()])
 
+MODEL_URL_DEFAULT = "https://github.com/spawner1145/NailongRecognize/raw/refs/heads/main/nailong.pth"
 model_path = ensure_model("nailong.pth")
 
 model: Any = torch.hub.load("pytorch/vision:v0.10.0", "resnet50", weights=None)

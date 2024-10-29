@@ -2,7 +2,7 @@ import httpx
 import torch
 from nonebot import logger
 
-from .config import MODEL_BASE_URL, config
+from .config import MODEL_BASE_URL, ModelType, config
 
 
 def ensure_model(model_filename: str):
@@ -11,8 +11,11 @@ def ensure_model(model_filename: str):
     model_version_path = config.nailong_model_dir / model_version_filename
 
     def download():
-        url = f"{MODEL_BASE_URL}/{model_filename}"
-        torch.hub.download_url_to_file(url, str(model_path), progress=True)
+        if config.nailong_model is ModelType.CLASSIFICATION:
+            from .classification import MODEL_URL_DEFAULT
+        elif config.nailong_model is ModelType.TARGET_DETECTION:
+            from .target_detection import MODEL_URL_DEFAULT
+        torch.hub.download_url_to_file(MODEL_URL_DEFAULT, str(model_path), progress=True)
 
     def get_model_version():
         url = f"{MODEL_BASE_URL}/{model_version_filename}"

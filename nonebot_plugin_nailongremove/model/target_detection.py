@@ -6,6 +6,7 @@ from .yolox_utils import demo_postprocess, multiclass_nms, preprocess
 from ..config import config
 COCO_CLASSES = ("_background_", "nailong", "anime", "human", "emoji", "long", "other")
 
+MODEL_URL_DEFAULT = "https://github.com/nkxingxh/NailongDetection/releases/download/v2.3/nailong_v2.3_tiny.onnx"
 model_path = ensure_model("nailong.onnx")
 
 session = onnxruntime.InferenceSession(model_path)
