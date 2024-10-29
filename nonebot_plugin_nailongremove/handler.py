@@ -1,5 +1,7 @@
+import asyncio
 import io
-from typing import Any, Awaitable, Callable, Iterable, List, TypeVar, cast
+from asyncio import Semaphore
+from typing import Any, Awaitable, Callable, Iterable, Iterator, List, TypeVar, cast
 
 import cv2
 import numpy as np
@@ -9,7 +11,6 @@ from nonebot.drivers import Request
 from nonebot.permission import SUPERUSER
 from nonebot.rule import Rule
 from nonebot.typing import T_State
-from nonebot.utils import run_sync
 from nonebot_plugin_alconna.builtins.uniseg.market_face import MarketFace
 from nonebot_plugin_alconna.uniseg import Image, UniMessage, UniMsg, image_fetch
 from nonebot_plugin_uninfo import QryItrface, Uninfo
@@ -22,34 +23,20 @@ from .uniapi import mute, recall
 T = TypeVar("T")
 
 
-def transform_image(image_data: bytes) -> list[np.ndarray]:
+def transform_image(image_data: bytes) -> Iterator[np.ndarray]:
     image = PilImage.open(io.BytesIO(image_data))
-    frames = []
+    image = image.convert("RGB")
 
-    if getattr(image, "is_animated", False):
-        # 遍历每一帧
-        for frame in range(image.n_frames):
-            image.seek(frame)
-            frame_image = image.convert("RGB")
-            frame_array = np.array(frame_image)
-
-            # 转换为BGR格式
-            if len(frame_array.shape) == 3 and frame_array.shape[2] == 3:
-                frame_array = cv2.cvtColor(frame_array, cv2.COLOR_RGB2BGR)
-
-            frames.append(frame_array)
-    else:
-        image = image.convert("RGB")
+    def process_frame(index: int = 0) -> np.ndarray:
+        image.seek(index)
         image_array = np.array(image)
-
         # 转换为BGR格式
         if len(image_array.shape) == 3 and image_array.shape[2] == 3:
             image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
+        return image_array
 
-        frames.append(image_array)
-
-    return frames
-
+    frame_num: int = getattr(image, "n_frames", 1)
+    yield from (process_frame(i) for i in range(frame_num))
 
 
 def judge_list(lst: Iterable[T], val: T, blacklist: bool) -> bool:
@@ -117,7 +104,34 @@ async def nailong_rule(
     )
 
 
-nailong = on_message(rule=Rule(nailong_rule))
+async def check_frames(frames: Iterator[np.ndarray]) -> bool:
+    signal = asyncio.Future[bool]()
+    sem = Semaphore(config.nailong_concurrency)
+
+    async def task(f: np.ndarray):
+        try:
+            async with sem:
+                ok = await check_image(f)
+        except Exception as e:
+            signal.set_exception(e)
+        else:
+            signal.set_result(ok)
+
+    async def wait_result():
+        nonlocal signal
+        ok = await signal
+        signal = asyncio.Future()
+        return ok
+
+    for f in frames:
+        if (sem.locked() or signal.done()) and (await wait_result()):
+            return True
+        asyncio.create_task(task(f))
+
+    return await wait_result()
+
+
+nailong = on_message(rule=Rule(nailong_rule), priority=config.nailong_priority)
 
 
 @nailong.handle()
@@ -149,9 +163,8 @@ async def handle_function(
             continue
 
         try:
-            check_ok = await run_sync(check_image)(
-                await run_sync(transform_image)(image),
-            )
+            frames = transform_image(image)
+            check_ok = await check_frames(frames)
         except Exception:
             logger.exception(f"Failed to process image: {seg!r}")
             continue
