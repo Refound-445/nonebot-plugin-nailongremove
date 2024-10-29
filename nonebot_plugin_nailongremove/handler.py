@@ -139,8 +139,8 @@ async def check_frames(
         return ok
 
     for f in frames:
-        if (sem.locked() or signal.done()) and (await wait_result()):
-            return True, None
+        if (sem.locked() or signal.done()) and (r := await wait_result())[0]:
+            return r
         asyncio.create_task(task(f))
 
     return await wait_result()
