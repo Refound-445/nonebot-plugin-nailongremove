@@ -1,15 +1,6 @@
 import asyncio
 import io
-from typing import (
-    Any,
-    Awaitable,
-    Callable,
-    Iterable,
-    Iterator,
-    List,
-    TypeVar,
-    cast,
-)
+from typing import Any, Awaitable, Callable, Iterable, Iterator, List, TypeVar, cast
 
 import cv2
 import numpy as np
