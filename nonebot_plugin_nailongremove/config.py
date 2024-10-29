@@ -1,6 +1,6 @@
 from enum import Enum
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from nonebot import get_plugin_config
 from pydantic import BaseModel, Field
@@ -29,6 +29,7 @@ class Config(BaseModel):
     nailong_priority: int = 100
     nailong_yolox_size: Tuple[int, int] = (416, 416)
     nailong_auto_update_model: bool = True
+    nailong_github_token: Optional[str] = None
 
 
 config = get_plugin_config(Config)

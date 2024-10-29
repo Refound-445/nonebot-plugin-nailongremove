@@ -10,6 +10,10 @@ from .config import config
 ModelVersionGetter: TypeAlias = Callable[[], str]
 
 
+def get_github():
+    return GitHub(config.nailong_github_token)
+
+
 def format_github_release_download_base_url(owner: str, name: str, tag: str):
     return f"https://github.com/{owner}/{name}/releases/download/{tag}"
 
@@ -33,7 +37,7 @@ def make_github_repo_sha_getter(
     filename: str,
 ):
     def getter() -> str:
-        github = GitHub()
+        github = get_github()
         ret = github.rest.git.get_tree(owner, repo, f"{branch}:{folder}")
         return next(
             x.sha[:7]
@@ -51,7 +55,7 @@ def make_github_release_update_time_getter(
     filename: str,
 ):
     def getter() -> str:
-        github = GitHub()
+        github = get_github()
         ret = github.rest.repos.get_release_by_tag(owner, repo, tag)
         asset = next(x for x in ret.parsed_data.assets if x.name == filename)
         return asset.updated_at.strftime("%Y-%m-%d_%H-%M-%S")
@@ -84,21 +88,22 @@ def ensure_model(
     try:
         ver = model_version_getter()
     except Exception as e:
-        logger.warning(
+        logger.error(
             f"Failed to get model version of {model_filename}: "
             f"{type(e).__name__}: {e}",
         )
-        logger.exception("Stacktrace")
+        if model_exists:
+            logger.exception("Stacktrace")
+        else:
+            raise
         ver = None
 
-    if model_exists and (ver is None):
+    if ver is None:
         logger.warning("Skip update.")
-        return model_path
-
-    if (not model_exists) or local_ver != ver:
+    elif local_ver != ver:
         logger.info(
             f"Updating model {model_filename} "
-            f"from version {local_ver or 'Unknown'} to version {ver or 'Unknown'}",
+            f"from version {local_ver or 'Unknown'} to version {ver}",
         )
         download()
         if ver:

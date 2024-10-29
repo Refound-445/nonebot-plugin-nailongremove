@@ -144,6 +144,7 @@ plugins = [
 |     `NAILONG_PRIORITY`      |  否  |                       `100`                       |                                                                          Matcher 优先级                                                                           |
 |    `NAILONG_YOLOX_SIZE`     |  否  |                    `[416,416]`                    |                                                          主要针对模型 1，自定义模型输入可能会有尺寸更改                                                           |
 | `NAILONG_AUTO_UPDATE_MODEL` |  否  |                      `True`                       |                                                                         是否自动更新模型                                                                          |
+|   `NAILONG_GITHUB_TOKEN`    |  否  |                      `None`                       |                                                      GitHub Access Token，遇到模型下载或更新问题时可尝试填写                                                      |
 
 ### 可用模型
 
