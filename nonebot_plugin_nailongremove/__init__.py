@@ -9,7 +9,7 @@ require("nonebot_plugin_uninfo")
 from . import handler as handler
 from .config import Config
 
-__version__ = "2.1.1.post2"
+__version__ = "2.1.2"
 __plugin_meta__ = PluginMetadata(
     name="自动撤回奶龙",
     description="一个基于图像分类模型的简单插件~",

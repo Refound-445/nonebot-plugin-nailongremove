@@ -1,6 +1,5 @@
 import asyncio
 import io
-from asyncio import Semaphore
 from typing import (
     Any,
     Awaitable,
@@ -13,6 +12,7 @@ from typing import (
     TypeVar,
     cast,
 )
+from typing_extensions import TypeAlias
 
 import cv2
 import numpy as np
@@ -115,35 +115,35 @@ async def nailong_rule(
     )
 
 
-async def check_frames(
-    frames: Iterator[np.ndarray],
-) -> Tuple[bool, Optional[np.ndarray]]:
-    signal = asyncio.Future[Tuple[bool, Optional[np.ndarray]]]()
-    sem = Semaphore(config.nailong_concurrency)
+CheckFrameResult: TypeAlias = Tuple[bool, Optional[np.ndarray]]
 
-    async def task(f: np.ndarray):
-        try:
-            async with sem:
-                ok = await check_image(f)
-        except Exception as e:
-            signal.set_exception(e)
-        else:
-            if isinstance(ok, bool):
-                ok = (ok, None)
-            signal.set_result(ok)
 
-    async def wait_result():
-        nonlocal signal
-        ok = await signal
-        signal = asyncio.Future()
-        return ok
+async def check_frames(frames: Iterator[np.ndarray]) -> CheckFrameResult:
+    async def worker() -> CheckFrameResult:
+        while True:
+            try:
+                frame = next(frames)
+            except StopIteration:
+                return False, None
+            res = await check_image(frame)
+            if not isinstance(res, tuple):
+                res = res, None
+            if res[0]:
+                return res
 
-    for f in frames:
-        if (sem.locked() or signal.done()) and (r := await wait_result())[0]:
-            return r
-        asyncio.create_task(task(f))
+    tasks = [asyncio.create_task(worker()) for _ in range(config.nailong_concurrency)]
+    while True:
+        if not tasks:
+            break
+        done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+        for t in done:
+            if (res := t.result())[0]:
+                for pt in pending:
+                    pt.cancel()
+                return res
+        tasks = pending
 
-    return await wait_result()
+    return False, None
 
 
 nailong = on_message(rule=Rule(nailong_rule), priority=config.nailong_priority)
