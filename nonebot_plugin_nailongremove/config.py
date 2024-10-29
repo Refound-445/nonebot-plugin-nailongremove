@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 class Config(BaseModel):
     nailong_model_dir: Path = Field(
-        default_factory=lambda: Path.cwd() / "data" / "nailongremove",
+        default_factory=lambda: Path.cwd(),
     )
     nailong_bypass_superuser: bool = True
     nailong_bypass_admin: bool = True
@@ -18,6 +18,7 @@ class Config(BaseModel):
     nailong_mute_seconds: int = 0
     nailong_tip: str = "本群禁止发送奶龙！"
     nailong_failed_tip: str = "{:Reply($message_id)}呜，不要发奶龙了嘛 🥺 👉👈"
+    nailong_model:int=0
 
 
 config = get_plugin_config(Config)

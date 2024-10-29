@@ -22,25 +22,34 @@ from .uniapi import mute, recall
 T = TypeVar("T")
 
 
-def transform_image(image_data: bytes) -> np.ndarray:
+def transform_image(image_data: bytes) -> list[np.ndarray]:
     image = PilImage.open(io.BytesIO(image_data))
+    frames = []
 
-    if (
-        # image.format == "GIF" and
-        getattr(image, "is_animated", False)
-    ):
-        # 处理动图：仅获取第一帧
-        image = image.convert("RGB")
-        image = image.copy()  # 获取第一帧
+    if getattr(image, "is_animated", False):
+        # 遍历每一帧
+        for frame in range(image.n_frames):
+            image.seek(frame)
+            frame_image = image.convert("RGB")
+            frame_array = np.array(frame_image)
+
+            # 转换为BGR格式
+            if len(frame_array.shape) == 3 and frame_array.shape[2] == 3:
+                frame_array = cv2.cvtColor(frame_array, cv2.COLOR_RGB2BGR)
+
+            frames.append(frame_array)
     else:
         image = image.convert("RGB")
+        image_array = np.array(image)
 
-    image_array = np.array(image)
-    # OpenCV通常使用BGR格式，因此需要转换
-    if len(image_array.shape) == 3 and image_array.shape[2] == 3:
-        image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
+        # 转换为BGR格式
+        if len(image_array.shape) == 3 and image_array.shape[2] == 3:
+            image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
 
-    return image_array
+        frames.append(image_array)
+
+    return frames
+
 
 
 def judge_list(lst: Iterable[T], val: T, blacklist: bool) -> bool:
