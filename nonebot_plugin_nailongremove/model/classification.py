@@ -6,13 +6,19 @@ import torch
 from torch import nn
 from torchvision import transforms
 
-from ..utils import ensure_model
+from ..utils import ensure_model_from_github_repo
 
 cuda_available = torch.cuda.is_available()
 device = torch.device("cuda" if cuda_available else "cpu")
 transform = transforms.Compose([transforms.ToTensor()])
 
-model_path = ensure_model("nailong.pth")
+model_path = ensure_model_from_github_repo(
+    "spawner1145",
+    "NailongRecognize",
+    "main",
+    "",
+    "nailong.pth",
+)
 
 model: Any = torch.hub.load("pytorch/vision:v0.10.0", "resnet50", weights=None)
 model.fc = nn.Linear(model.fc.in_features, 2)  # 修改最后一层为分类层

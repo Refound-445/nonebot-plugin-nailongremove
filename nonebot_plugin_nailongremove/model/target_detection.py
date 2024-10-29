@@ -2,12 +2,17 @@ import numpy as np
 import onnxruntime
 
 from ..config import config
-from ..utils import ensure_model
+from ..utils import ensure_model_from_github_release
 from .yolox_utils import demo_postprocess, multiclass_nms, preprocess
 
 COCO_CLASSES = ("_background_", "nailong", "anime", "human", "emoji", "long", "other")
 
-model_path = ensure_model("nailong.onnx")
+model_path = ensure_model_from_github_release(
+    "nkxingxh",
+    "NailongDetection",
+    "v2.3",
+    "nailong_v2.3_tiny.onnx",
+)
 
 session = onnxruntime.InferenceSession(model_path)
 input_shape = config.nailong_yolox_size
@@ -35,8 +40,14 @@ def check_image(image: np.ndarray) -> bool:
             dets[:, 4],  # type: ignore
             dets[:, 5],  # type: ignore
         )
-        # image = vis(image, final_boxes, final_scores, final_cls_inds,
-        #                  conf=0.3, class_names=COCO_CLASSES)
+        # image = vis(
+        #     image,
+        #     final_boxes,
+        #     final_scores,
+        #     final_cls_inds,
+        #     conf=0.3,
+        #     class_names=COCO_CLASSES,
+        # )
         for i in range(len(final_scores)):
             if final_cls_inds[i] == 1 and final_scores[i] > 0.5:
                 return True

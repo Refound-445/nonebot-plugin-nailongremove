@@ -1,14 +1,71 @@
-import httpx
+from typing import Callable
+from typing_extensions import TypeAlias
+
 import torch
+from githubkit import GitHub
 from nonebot import logger
 
-from .config import MODEL_BASE_URL, config
+from .config import config
+
+ModelVersionGetter: TypeAlias = Callable[[], str]
 
 
-def ensure_model(model_filename: str):
-    model_version_filename = f"{model_filename}.ver.txt"
+def format_github_release_download_base_url(owner: str, name: str, tag: str):
+    return f"https://github.com/{owner}/{name}/releases/download/{tag}"
+
+
+def format_github_repo_download_base_url(
+    owner: str,
+    name: str,
+    branch: str,
+    folder: str,
+):
+    return f"https://github.com/{owner}/{name}/raw/refs/heads/{branch}/{folder}".removesuffix(
+        "/",
+    )
+
+
+def make_github_repo_sha_getter(
+    owner: str,
+    repo: str,
+    branch: str,
+    folder: str,
+    filename: str,
+):
+    def getter() -> str:
+        github = GitHub()
+        ret = github.rest.git.get_tree(owner, repo, f"{branch}:{folder}")
+        return next(
+            x.sha[:7]
+            for x in ret.parsed_data.tree
+            if x.path == filename and isinstance(x.sha, str)
+        )
+
+    return getter
+
+
+def make_github_release_update_time_getter(
+    owner: str,
+    repo: str,
+    tag: str,
+    filename: str,
+):
+    def getter() -> str:
+        github = GitHub()
+        ret = github.rest.repos.get_release_by_tag(owner, repo, tag)
+        asset = next(x for x in ret.parsed_data.assets if x.name == filename)
+        return asset.updated_at.strftime("%Y-%m-%d_%H-%M-%S")
+
+    return getter
+
+
+def ensure_model(
+    model_base_url: str,
+    model_filename: str,
+    model_version_getter: ModelVersionGetter,
+):
     model_path = config.nailong_model_dir / model_filename
-    model_version_path = config.nailong_model_dir / model_version_filename
+    model_version_path = config.nailong_model_dir / f"{model_filename}.ver.txt"
 
     model_exists = model_path.exists()
     local_ver = (
@@ -21,17 +78,16 @@ def ensure_model(model_filename: str):
         return model_path
 
     def download():
-        url = f"{MODEL_BASE_URL}/{model_filename}"
+        url = f"{model_base_url}/{model_filename}"
         torch.hub.download_url_to_file(url, str(model_path), progress=True)
 
-    def get_model_version():
-        url = f"{MODEL_BASE_URL}/{model_version_filename}"
-        return httpx.get(url, follow_redirects=True).raise_for_status().text.strip()
-
     try:
-        ver = get_model_version()
-    except Exception:
-        logger.warning(f"Failed to get model version of {model_filename}")
+        ver = model_version_getter()
+    except Exception as e:
+        logger.warning(
+            f"Failed to get model version of {model_filename}: "
+            f"{type(e).__name__}: {e}",
+        )
         logger.exception("Stacktrace")
         ver = None
 
@@ -49,3 +105,25 @@ def ensure_model(model_filename: str):
             model_version_path.write_text(ver, encoding="u8")
 
     return model_path
+
+
+def ensure_model_from_github_release(owner: str, repo: str, tag: str, filename: str):
+    return ensure_model(
+        format_github_release_download_base_url(owner, repo, tag),
+        filename,
+        make_github_release_update_time_getter(owner, repo, tag, filename),
+    )
+
+
+def ensure_model_from_github_repo(
+    owner: str,
+    repo: str,
+    branch: str,
+    folder: str,
+    filename: str,
+):
+    return ensure_model(
+        format_github_repo_download_base_url(owner, repo, branch, folder),
+        filename,
+        make_github_repo_sha_getter(owner, repo, branch, folder, filename),
+    )

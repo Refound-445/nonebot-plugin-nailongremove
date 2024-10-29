@@ -5,8 +5,6 @@ from typing import List, Tuple
 from nonebot import get_plugin_config
 from pydantic import BaseModel, Field
 
-MODEL_BASE_URL = "https://github.com/Refound-445/nonebot-plugin-nailongremove/releases/download/weights"
-
 
 class ModelType(int, Enum):
     CLASSIFICATION = 0
