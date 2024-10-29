@@ -203,7 +203,7 @@ async def handle_function(
         }
         if checked_image is not None:
             bio = io.BytesIO()
-            img = PilImage.fromarray(checked_image)
+            img = PilImage.fromarray(cv2.cvtColor(checked_image, cv2.COLOR_BGR2RGB))
             img.save(bio, "PNG")
             mapping["$checked_image"] = bio.getvalue()
         await UniMessage.template(template_str).format_map(mapping).finish()
