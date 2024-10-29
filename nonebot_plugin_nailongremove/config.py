@@ -1,6 +1,6 @@
 from enum import Enum
 from pathlib import Path
-from typing import List,Tuple
+from typing import List, Tuple
 
 from nonebot import get_plugin_config
 from pydantic import BaseModel, Field
@@ -15,7 +15,7 @@ class ModelType(int, Enum):
 
 class Config(BaseModel):
     nailong_model_dir: Path = Field(
-        default_factory=lambda: Path.cwd(),
+        default_factory=lambda: Path.cwd() / "data" / "nailongremove",
     )
     nailong_bypass_superuser: bool = True
     nailong_bypass_admin: bool = True
@@ -29,8 +29,8 @@ class Config(BaseModel):
     nailong_model: ModelType = ModelType.CLASSIFICATION
     nailong_concurrency: int = 1
     nailong_priority: int = 100
-    yolox_size:Tuple[int,int]=(416,416)
-    auto_update:bool=True
+    nailong_yolox_size: Tuple[int, int] = (416, 416)
+    nailong_auto_update_model: bool = True
 
 
 config = get_plugin_config(Config)

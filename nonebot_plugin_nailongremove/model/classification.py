@@ -8,7 +8,8 @@ from torchvision import transforms
 
 from ..utils import ensure_model
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+cuda_available = torch.cuda.is_available()
+device = torch.device("cuda" if cuda_available else "cpu")
 transform = transforms.Compose([transforms.ToTensor()])
 
 MODEL_URL_DEFAULT = "https://github.com/spawner1145/NailongRecognize/raw/refs/heads/main/nailong.pth"
@@ -20,6 +21,8 @@ model.load_state_dict(
     torch.load(model_path, weights_only=True, map_location=device),
 )
 model.eval()
+if cuda_available:
+    model.cuda()
 
 
 def check_image(image: np.ndarray) -> bool:

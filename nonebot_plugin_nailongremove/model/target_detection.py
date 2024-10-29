@@ -1,16 +1,17 @@
 import numpy as np
 import onnxruntime
 
+from ..config import config
 from ..utils import ensure_model
 from .yolox_utils import demo_postprocess, multiclass_nms, preprocess
-from ..config import config
+
 COCO_CLASSES = ("_background_", "nailong", "anime", "human", "emoji", "long", "other")
 
 MODEL_URL_DEFAULT = "https://github.com/nkxingxh/NailongDetection/releases/download/v2.3/nailong_v2.3_tiny.onnx"
 model_path = ensure_model("nailong.onnx")
 
 session = onnxruntime.InferenceSession(model_path)
-input_shape = config.yolox_size
+input_shape = config.nailong_yolox_size
 
 
 def check_image(image: np.ndarray) -> bool:
