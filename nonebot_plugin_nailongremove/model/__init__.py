@@ -1,4 +1,5 @@
-from typing import Callable, NoReturn, Tuple, Union
+from typing import Awaitable, Callable, Literal, NoReturn, Tuple, Union
+from typing_extensions import TypeAlias
 
 import numpy as np
 from nonebot.utils import run_sync
@@ -14,7 +15,13 @@ def raise_extra_import_error(e: BaseException, group: str) -> NoReturn:
     ) from e
 
 
-check_image_sync: Callable[[np.ndarray], Union[bool, Tuple[bool, np.ndarray]]]
+CheckResultTuple: TypeAlias = Union[
+    Tuple[bool, None],
+    Tuple[Literal[True], np.ndarray],
+]
+CheckResult: TypeAlias = Union[bool, CheckResultTuple]
+
+check_image_sync: Callable[[np.ndarray], CheckResult]
 
 if config.nailong_model is ModelType.CLASSIFICATION:
     from .classification import check_image as check_image_sync
@@ -29,4 +36,4 @@ else:
     raise ValueError("Invalid model type")
 
 
-check_image = run_sync(check_image_sync)
+check_image: Callable[[np.ndarray], Awaitable[CheckResult]] = run_sync(check_image_sync)

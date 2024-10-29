@@ -1,4 +1,4 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import cv2
 import numpy as np
@@ -7,6 +7,9 @@ from torch import nn
 from torchvision import transforms
 
 from ..utils import ensure_model_from_github_repo
+
+if TYPE_CHECKING:
+    from . import CheckResult
 
 cuda_available = torch.cuda.is_available()
 device = torch.device("cuda" if cuda_available else "cpu")
@@ -30,7 +33,7 @@ if cuda_available:
     model.cuda()
 
 
-def check_image(image: np.ndarray):
+def check_image(image: np.ndarray) -> "CheckResult":
     if image.shape[0] < 224 or image.shape[1] < 224:
         return False
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)

@@ -7,12 +7,9 @@ from typing import (
     Iterable,
     Iterator,
     List,
-    Optional,
-    Tuple,
     TypeVar,
     cast,
 )
-from typing_extensions import TypeAlias
 
 import cv2
 import numpy as np
@@ -28,7 +25,7 @@ from nonebot_plugin_uninfo import QryItrface, Uninfo
 from PIL import Image as PilImage
 
 from .config import config
-from .model import check_image
+from .model import CheckResultTuple, check_image
 from .uniapi import mute, recall
 
 T = TypeVar("T")
@@ -115,11 +112,8 @@ async def nailong_rule(
     )
 
 
-CheckFrameResult: TypeAlias = Tuple[bool, Optional[np.ndarray]]
-
-
-async def check_frames(frames: Iterator[np.ndarray]) -> CheckFrameResult:
-    async def worker() -> CheckFrameResult:
+async def check_frames(frames: Iterator[np.ndarray]) -> CheckResultTuple:
+    async def worker() -> CheckResultTuple:
         while True:
             try:
                 frame = next(frames)

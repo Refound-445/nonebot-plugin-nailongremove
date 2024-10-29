@@ -1,9 +1,14 @@
+from typing import TYPE_CHECKING
+
 import numpy as np
 import onnxruntime
 
 from ..config import config
 from ..utils import ensure_model_from_github_release
 from .yolox_utils import demo_postprocess, multiclass_nms, preprocess, vis
+
+if TYPE_CHECKING:
+    from . import CheckResult
 
 COCO_CLASSES = ("_background_", "nailong", "anime", "human", "emoji", "long", "other")
 
@@ -18,7 +23,7 @@ session = onnxruntime.InferenceSession(model_path)
 input_shape = config.nailong_yolox_size
 
 
-def check_image(image: np.ndarray):
+def check_image(image: np.ndarray) -> "CheckResult":
     img, ratio = preprocess(image, input_shape)
     ort_inputs = {session.get_inputs()[0].name: img[None, :, :, :]}
     output = session.run(None, ort_inputs)
