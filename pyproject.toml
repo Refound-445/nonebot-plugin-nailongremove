@@ -26,8 +26,8 @@ readme = "README.md"
 keywords = ["nonebot", "plugin", "image"]
 
 [project.urls]
-homepage = "https://github.com/Refound-445/onoebot-plugin-nailongremove"
-repository = "https://github.com/Refound-445/onoebot-plugin-nailongremove"
+homepage = "https://github.com/Refound-445/nonebot-plugin-nailongremove"
+repository = "https://github.com/Refound-445/nonebot-plugin-nailongremove"
 
 [project.optional-dependencies]
 model1 = ["onnxruntime>=1.19.2"]
