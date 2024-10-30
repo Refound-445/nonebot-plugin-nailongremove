@@ -61,6 +61,8 @@ NaiLongRemove 是一款由简单的 AI 模型建立的奶龙识别插件，可�
 用户可以根据需要自行选择心仪的模型，两个模型性能都已经经过优化，但仍可能会有不同程度的误差，也欢迎各位继续反馈给我们~
 
 ## 💿 安装
+[nailongremove部署指南](https://y0b8o2qjszv.feishu.cn/docx/GJ7ndJU2Aod6jtxpukXcA6etnyb?from=from_copylink)
+
 
 以下提到的方法 任选**其一** 即可
 
@@ -122,7 +124,6 @@ plugins = [
 ```
 
 </details>
-[nailongremove部署指南](https://y0b8o2qjszv.feishu.cn/docx/GJ7ndJU2Aod6jtxpukXcA6etnyb?from=from_copylink)
 
 ## ⚙️ 配置
 
