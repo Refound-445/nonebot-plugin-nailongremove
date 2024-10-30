@@ -101,11 +101,12 @@ async def telegram(bot: BaseBot, ev: BaseEvent, seconds: int):
     if not (isinstance(bot, Bot) and isinstance(ev, GroupMessageEvent)):
         raise TypeError("Unsupported bot or event type")
 
+    should_not_mute = seconds < 30
     await bot.restrict_chat_member(
         chat_id=ev.chat.id,
         user_id=ev.from_.id,
-        permissions=ChatPermissions(can_send_messages=seconds < 30),
-        until_date=int(time()) + seconds,
+        permissions=ChatPermissions(can_send_messages=should_not_mute),
+        until_date=None if should_not_mute else int(time()) + seconds,
     )
 
 

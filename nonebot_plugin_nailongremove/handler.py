@@ -94,7 +94,7 @@ async def nailong_rule(
                     )
                 )
                 and self_info.role
-                and self_info.role.level >= 1,
+                and self_info.role.level > 1,
             )
         )
     )
