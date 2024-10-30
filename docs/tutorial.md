@@ -195,3 +195,80 @@ Linux 下也可以使用 `./#run.sh`
 启动完成并且没问题的话，应该像下面这样，没有任何报错
 
 ![15](./assets/15.png)
+
+## 5. 配置野生 QQ 机器人协议端连接 NoneBot
+
+如果你想对接其他聊天平台（在第二步时安装了其他的适配器），请略过这节并自行查看对应平台适配器的文档，见 [适配器商店](https://nonebot.dev/store/adapters)
+
+请在以下协议实现中选择**其中一个**你心仪的开始使用即可
+
+### Lagrange.OneBot
+
+下载安装步骤参见 [NoneBotX 社区文档](https://x.none.bot/before/install_lagrange)
+
+注：首次启动生成配置文件（`appsettings.json`）后建议先在配置文件中把 Bot 的 QQ 号先填好，参考下面配置，把其中的 `0` 替换为你 Bot 的 QQ 号，密码不填使用扫码登录
+
+```jsonc
+{
+  // ...
+  "Account": {
+    "Uin": 0,
+    "Password": ""
+    // ...
+  }
+  // ...
+}
+```
+
+安装好后修改其配置文件使其以反向 Websocket 连接到 NoneBot 即可，参考下面配置，记得把下面 `Port` 后的 `8080` 修改成你之前配置的端口号
+
+```jsonc
+{
+  // ...
+  "Implementations": [
+    {
+      "Type": "ReverseWebSocket",
+      "Host": "127.0.0.1",
+      "Port": 8080,
+      "Suffix": "/onebot/v11/ws",
+      "ReconnectInterval": 5000,
+      "HeartBeatInterval": 5000,
+      "HeartBeatEnable": true,
+      "AccessToken": ""
+    }
+  ]
+}
+```
+
+### NapCat
+
+基于 QQNT 本体的协议实现，需要安装 QQNT 客户端，但可以以无头（无图形界面）方式启动
+
+下载安装步骤参见 [NapCat 文档](https://napcat.napneko.icu/guide/start-install)
+
+安装好后修改其配置文件使其以反向 Websocket 连接到 NoneBot 即可，参考下面配置，记得把下面的 `8080` 修改成你之前配置的端口号
+
+```jsonc
+{
+  // ...
+  "wsReverse": {
+    "enable": true,
+    "urls": ["ws://127.0.0.1:8080/onebot/v11/ws"]
+  }
+  // ...
+}
+```
+
+## 6. 后续
+
+### 修改插件配置项
+
+参考 [NoneBot 文档 DotEnv 配置 一节](https://nonebot.dev/docs/appendices/config#dotenv-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6) 的文件格式，修改 `.env.prod` 文件即可
+
+### 更新插件
+
+在 Bot 项目目录下打开命令行，之后执行下面命令即可
+
+```shell
+nb plugin update nonebot-plugin-nailongremove
+```
