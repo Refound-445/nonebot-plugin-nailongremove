@@ -13,6 +13,7 @@
 
 > [!NOTE]
 > 本人不喜欢 Conda 给系统上它的默认环境，所以下面不介绍如何使用 Conda
+> 基于Anaconda虚拟环境可以参考：[nailongremove部署教程](https://y0b8o2qjszv.feishu.cn/docx/GJ7ndJU2Aod6jtxpukXcA6etnyb)
 
 ### Windows
 
