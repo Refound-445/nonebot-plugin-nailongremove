@@ -122,7 +122,7 @@ plugins = [
 ```
 
 </details>
-
+[nailongremove部署指南](https://y0b8o2qjszv.feishu.cn/docx/GJ7ndJU2Aod6jtxpukXcA6etnyb?from=from_copylink)
 ## ⚙️ 配置
 
 在 nonebot2 项目的 `.env` 文件中添加下表中的必填配置
