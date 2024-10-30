@@ -13,8 +13,8 @@
 
 > [!NOTE]
 > 本人不喜欢 Conda 给系统上它的默认环境，所以下面不介绍如何使用 Conda
-> 
-> 基于Anaconda虚拟环境可以参考：[nailongremove部署教程](https://y0b8o2qjszv.feishu.cn/docx/GJ7ndJU2Aod6jtxpukXcA6etnyb)
+>
+> 基于 Anaconda 虚拟环境可以参考：[nailongremove 部署教程](https://y0b8o2qjszv.feishu.cn/docx/GJ7ndJU2Aod6jtxpukXcA6etnyb)
 
 ### Windows
 
@@ -266,6 +266,14 @@ Linux 下也可以使用 `./#run.sh`
 ### 修改插件配置项
 
 参考 [NoneBot 文档 DotEnv 配置 一节](https://nonebot.dev/docs/appendices/config#dotenv-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6) 的文件格式，修改 `.env.prod` 文件即可
+
+例：如果我想修改 `NAILONG_MODEL` 配置为 `1`，则在 `.env.prod` 配置中按如下格式修改
+
+```properties
+NAILONG_MODEL=1
+```
+
+![16](./assets/16.png)
 
 ### 更新插件
 
