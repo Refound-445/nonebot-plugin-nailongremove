@@ -33,6 +33,7 @@ class Config(BaseModel):
 
     nailong_model1_yolox_size: Tuple[int, int] = (416, 416)
     nailong_model1_type: str = "tiny"
+    nailong_model1_score: float = 0.5
 
     nailong_github_token: Optional[str] = None
 

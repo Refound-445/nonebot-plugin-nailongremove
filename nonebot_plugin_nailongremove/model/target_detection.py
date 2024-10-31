@@ -65,7 +65,14 @@ def get_latest_model() -> Path:
 
 model_path = get_latest_model()
 
-session = onnxruntime.InferenceSession(model_path)
+session = onnxruntime.InferenceSession(
+    model_path,
+    providers=[
+        "TensorrtExecutionProvider",
+        "CUDAExecutionProvider",
+        "CPUExecutionProvider",
+    ],
+)
 input_shape = config.nailong_model1_yolox_size
 
 
@@ -85,21 +92,27 @@ def check_image(image: np.ndarray) -> "CheckResult":
     boxes_xyxy[:, 3] = boxes[:, 1] + boxes[:, 3] / 2.0
     boxes_xyxy /= ratio
     dets = multiclass_nms(boxes_xyxy, scores, nms_thr=0.45, score_thr=0.1)
-    if dets is not None:
-        final_boxes, final_scores, final_cls_inds = (
-            dets[:, :4],  # type: ignore
-            dets[:, 4],  # type: ignore
-            dets[:, 5],  # type: ignore
+    if dets is None:
+        return False
+
+    final_boxes, final_scores, final_cls_inds = (
+        dets[:, :4],  # type: ignore
+        dets[:, 4],  # type: ignore
+        dets[:, 5],  # type: ignore
+    )
+    has = any(
+        True
+        for c, s in zip(final_cls_inds, final_scores)
+        if c == 1 and s >= config.nailong_model1_score
+    )
+    if has:
+        image = vis(
+            image,
+            final_boxes,
+            final_scores,
+            final_cls_inds,
+            conf=0.3,
+            class_names=COCO_CLASSES,
         )
-        for i in range(len(final_scores)):
-            if final_cls_inds[i] == 1 and final_scores[i] > 0.5:
-                image = vis(
-                    image,
-                    final_boxes,
-                    final_scores,
-                    final_cls_inds,
-                    conf=0.3,
-                    class_names=COCO_CLASSES,
-                )
-                return True, image
+        return True, image
     return False

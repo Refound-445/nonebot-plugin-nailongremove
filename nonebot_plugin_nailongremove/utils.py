@@ -1,4 +1,6 @@
-from typing import Callable, Optional, Tuple, Union
+import hashlib
+from pathlib import Path
+from typing import Any, Callable, Tuple, Union
 from typing_extensions import TypeAlias
 
 import torch
@@ -7,11 +9,12 @@ from nonebot import logger
 
 from .config import config
 
+ModelValidator: TypeAlias = Callable[[Path], Any]
 ModelVersionGetter: TypeAlias = Callable[
     [],
     Union[
         str,
-        Tuple[str, Optional[str]],
+        Tuple[str, ModelValidator],
     ],
 ]
 
@@ -35,6 +38,21 @@ def format_github_repo_download_base_url(
     )
 
 
+def make_sha1_validator(expected: str):
+    def validator(file_path: Path):
+        sha = hashlib.sha1()  # noqa: S324
+        with file_path.open("rb") as f:
+            while True:
+                data = f.read(1048576)  # 1024 * 1024
+                if not data:
+                    break
+                sha.update(data)
+        if (got := sha.hexdigest()) != expected:
+            raise ValueError(f"Invalid SHA1, expected {expected}, got {got}")
+
+    return validator
+
+
 def make_github_repo_sha_getter(
     owner: str,
     repo: str,
@@ -42,7 +60,7 @@ def make_github_repo_sha_getter(
     folder: str,
     filename: str,
 ):
-    def getter() -> Tuple[str, str]:
+    def getter() -> str:
         github = get_github()
         ret = github.rest.git.get_tree(owner, repo, f"{branch}:{folder}")
         sha = next(
@@ -50,7 +68,7 @@ def make_github_repo_sha_getter(
             for x in ret.parsed_data.tree
             if x.path == filename and isinstance(x.sha, str)
         )
-        return sha[:7], sha
+        return sha[:7]
 
     return getter
 
@@ -96,6 +114,8 @@ def ensure_model(
         logger.info(f"Using model {model_filename} (version {local_ver or 'Unknown'})")
         return model_path
 
+    ver = None
+    validator = None
     try:
         ver_ret = model_version_getter()
     except Exception as e:
@@ -107,25 +127,23 @@ def ensure_model(
             logger.opt(exception=e).debug("Stacktrace")
         else:
             raise
-        ver = None
-        sha = None
     else:
         if isinstance(ver_ret, tuple):
-            ver, sha = ver_ret
+            ver, validator = ver_ret
         else:
             ver = ver_ret
-            sha = None
 
     def download():
         if not config.nailong_model_dir.exists():
             config.nailong_model_dir.mkdir(parents=True)
         url = f"{model_base_url}/{model_filename}"
-        torch.hub.download_url_to_file(
-            url,
-            str(model_path),
-            hash_prefix=sha,
-            progress=True,
-        )
+        torch.hub.download_url_to_file(url, str(model_path), progress=True)
+        if validator is not None:
+            try:
+                validator(model_path)
+            except Exception:
+                model_path.unlink(missing_ok=True)
+                raise
 
     if ver is None:
         logger.warning("Skip update.")

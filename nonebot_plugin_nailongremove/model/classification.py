@@ -32,16 +32,17 @@ if cuda_available:
     model.cuda()
 
 
+SIZE = 224
+
+
 def check_image(image: np.ndarray) -> "CheckResult":
-    if image.shape[0] < 224 or image.shape[1] < 224:
+    if image.shape[0] < SIZE or image.shape[1] < SIZE:
         return False
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    image = cv2.resize(image, (224, 224))
+    image = cv2.resize(image, (SIZE, SIZE))
     image = transform(image)
     image = image.unsqueeze(0)  # type: ignore
     with torch.no_grad():
         output = model(image.to(device))  # type: ignore
         _, pred = torch.max(output, 1)
-        if pred.item() == 1:
-            return True
-    return False
+        return pred.item() == 1
