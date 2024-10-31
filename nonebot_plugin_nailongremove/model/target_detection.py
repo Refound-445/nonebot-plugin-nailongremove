@@ -1,20 +1,31 @@
 from typing import TYPE_CHECKING
+from typing_extensions import override
 
 import numpy as np
 import onnxruntime
 
 from ..config import config
-from .update import GitHubLatestReleaseModelUpdater
+from .update import GitHubLatestReleaseModelUpdater, ModelInfo
 from .yolox_utils import demo_postprocess, multiclass_nms, preprocess, vis
 
 if TYPE_CHECKING:
     from . import CheckResult
 
+model_filename_sfx = f"_{config.nailong_model1_type}.onnx"
 
-model_path = GitHubLatestReleaseModelUpdater(
+
+class ModelUpdater(GitHubLatestReleaseModelUpdater):
+    @override
+    def get_info(self) -> ModelInfo[None]:
+        info = super().get_info()
+        info.filename = f"nailong{model_filename_sfx}"
+        return info
+
+
+model_path = ModelUpdater(
     "nkxingxh",
     "NailongDetection",
-    lambda x: x.endswith(f"_{config.nailong_model1_type}.onnx"),
+    lambda x: x.endswith(model_filename_sfx),
 ).get()
 
 labels_path = GitHubLatestReleaseModelUpdater(
