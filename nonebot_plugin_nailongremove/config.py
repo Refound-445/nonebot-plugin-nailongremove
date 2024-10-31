@@ -32,11 +32,11 @@ class Config(BaseModel):
     nailong_model: ModelType = ModelType.CLASSIFICATION
     nailong_auto_update_model: bool = True
     nailong_concurrency: int = 1
+    nailong_onnx_try_to_use_gpu: bool = True
 
     nailong_model1_yolox_size: Tuple[int, int] = (416, 416)
     nailong_model1_type: str = "tiny"
     nailong_model1_score: float = 0.5
-    nailong_model1_try_to_use_gpu: bool = True
 
     nailong_github_token: Optional[str] = None
 

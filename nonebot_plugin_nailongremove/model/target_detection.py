@@ -43,7 +43,7 @@ session = onnxruntime.InferenceSession(
             "CUDAExecutionProvider",
             "CPUExecutionProvider",
         ]
-        if config.nailong_model1_try_to_use_gpu
+        if config.nailong_onnx_try_to_use_gpu
         else ["CPUExecutionProvider"]
     ),
 )
