@@ -6,18 +6,17 @@ import torch
 from torch import nn
 from torchvision import transforms
 
-from ..utils import ensure_model_from_github_repo
+from .update import GitHubRepoModelUpdater
 
 if TYPE_CHECKING:
     from . import CheckResult
 
-model_path = ensure_model_from_github_repo(
+model_path = GitHubRepoModelUpdater(
     "spawner1145",
     "NailongRecognize",
     "main",
-    "",
     "nailong.pth",
-)
+).get()
 
 cuda_available = torch.cuda.is_available()
 device = torch.device("cuda" if cuda_available else "cpu")
@@ -30,7 +29,6 @@ model.load_state_dict(
 model.eval()
 if cuda_available:
     model.cuda()
-
 
 SIZE = 224
 
