@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Optional, Tuple, Union
 from typing_extensions import TypeAlias
 
 import torch
@@ -7,7 +7,13 @@ from nonebot import logger
 
 from .config import config
 
-ModelVersionGetter: TypeAlias = Callable[[], str]
+ModelVersionGetter: TypeAlias = Callable[
+    [],
+    Union[
+        str,
+        Tuple[str, Optional[str]],
+    ],
+]
 
 
 def get_github():
@@ -36,16 +42,20 @@ def make_github_repo_sha_getter(
     folder: str,
     filename: str,
 ):
-    def getter() -> str:
+    def getter() -> Tuple[str, str]:
         github = get_github()
         ret = github.rest.git.get_tree(owner, repo, f"{branch}:{folder}")
-        return next(
-            x.sha[:7]
+        sha = next(
+            x.sha
             for x in ret.parsed_data.tree
             if x.path == filename and isinstance(x.sha, str)
         )
+        return sha[:7], sha
 
     return getter
+
+
+TIME_FORMAT_TEMPLATE = "%Y-%m-%d_%H-%M-%S"
 
 
 def make_github_release_update_time_getter(
@@ -58,9 +68,13 @@ def make_github_release_update_time_getter(
         github = get_github()
         ret = github.rest.repos.get_release_by_tag(owner, repo, tag)
         asset = next(x for x in ret.parsed_data.assets if x.name == filename)
-        return asset.updated_at.strftime("%Y-%m-%d_%H-%M-%S")
+        return asset.updated_at.strftime(TIME_FORMAT_TEMPLATE)
 
     return getter
+
+
+def get_ver_filename(filename: str) -> str:
+    return f"{filename}.ver.txt"
 
 
 def ensure_model(
@@ -69,7 +83,7 @@ def ensure_model(
     model_version_getter: ModelVersionGetter,
 ):
     model_path = config.nailong_model_dir / model_filename
-    model_version_path = config.nailong_model_dir / f"{model_filename}.ver.txt"
+    model_version_path = config.nailong_model_dir / get_ver_filename(model_filename)
 
     model_exists = model_path.exists()
     local_ver = (
@@ -79,16 +93,11 @@ def ensure_model(
     )
 
     if model_exists and (not config.nailong_auto_update_model):
+        logger.info(f"Using model {model_filename} (version {local_ver or 'Unknown'})")
         return model_path
 
-    def download():
-        if not config.nailong_model_dir.exists():
-            config.nailong_model_dir.mkdir(parents=True)
-        url = f"{model_base_url}/{model_filename}"
-        torch.hub.download_url_to_file(url, str(model_path), progress=True)
-
     try:
-        ver = model_version_getter()
+        ver_ret = model_version_getter()
     except Exception as e:
         logger.error(
             f"Failed to get model version of {model_filename}: "
@@ -99,6 +108,24 @@ def ensure_model(
         else:
             raise
         ver = None
+        sha = None
+    else:
+        if isinstance(ver_ret, tuple):
+            ver, sha = ver_ret
+        else:
+            ver = ver_ret
+            sha = None
+
+    def download():
+        if not config.nailong_model_dir.exists():
+            config.nailong_model_dir.mkdir(parents=True)
+        url = f"{model_base_url}/{model_filename}"
+        torch.hub.download_url_to_file(
+            url,
+            str(model_path),
+            hash_prefix=sha,
+            progress=True,
+        )
 
     if ver is None:
         logger.warning("Skip update.")
@@ -112,6 +139,7 @@ def ensure_model(
         download()
         model_version_path.write_text(ver, encoding="u8")
 
+    logger.info(f"Using model {model_filename} (version {local_ver or 'Unknown'})")
     return model_path
 
 

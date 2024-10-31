@@ -1,10 +1,14 @@
+from contextlib import suppress
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
 import onnxruntime
+from nonebot import logger
+from yarl import URL
 
 from ..config import config
-from ..utils import ensure_model_from_github_release
+from ..utils import TIME_FORMAT_TEMPLATE, ensure_model, get_github, get_ver_filename
 from .yolox_utils import demo_postprocess, multiclass_nms, preprocess, vis
 
 if TYPE_CHECKING:
@@ -12,15 +16,57 @@ if TYPE_CHECKING:
 
 COCO_CLASSES = ("_background_", "nailong", "anime", "human", "emoji", "long", "other")
 
-model_path = ensure_model_from_github_release(
-    "nkxingxh",
-    "NailongDetection",
-    "v2.3",
-    "nailong_v2.3_tiny.onnx",
-)
+
+model_filename_sfx = f"_{config.nailong_model1_type}.onnx"
+
+
+def find_local_model() -> Path:
+    local_models = [
+        x
+        for x in config.nailong_model_dir.iterdir()
+        if x.name.endswith(model_filename_sfx)
+    ]
+    local_models.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+    if not local_models:
+        raise FileNotFoundError("No local model found")
+    p = local_models[0]
+    version = (
+        vp.read_text("u8")
+        if (vp := (p.parent / get_ver_filename(p.name))).exists()
+        else "Unknown"
+    )
+    logger.info(f"Using local cached model: {p.name} (version {version})")
+    return p
+
+
+def get_latest_model() -> Path:
+    if not config.nailong_auto_update_model:
+        with suppress(FileNotFoundError):
+            return find_local_model()
+
+    github = get_github()
+    try:
+        ret = github.rest.repos.get_latest_release("nkxingxh", "NailongDetection")
+        asset = next(
+            x for x in ret.parsed_data.assets if x.name.endswith(model_filename_sfx)
+        )
+        url = URL(asset.browser_download_url)
+        version = asset.updated_at.strftime(TIME_FORMAT_TEMPLATE)
+        return ensure_model(
+            str(url.parent),
+            url.name,
+            lambda: version,
+        )
+    except Exception as e:
+        logger.warning(f"Failed to get latest model: {type(e).__name__}: {e}")
+        logger.opt(exception=e).debug("Stacktrace")
+        return find_local_model()
+
+
+model_path = get_latest_model()
 
 session = onnxruntime.InferenceSession(model_path)
-input_shape = config.nailong_yolox_size
+input_shape = config.nailong_model1_yolox_size
 
 
 def check_image(image: np.ndarray) -> "CheckResult":
@@ -45,7 +91,6 @@ def check_image(image: np.ndarray) -> "CheckResult":
             dets[:, 4],  # type: ignore
             dets[:, 5],  # type: ignore
         )
-
         for i in range(len(final_scores)):
             if final_cls_inds[i] == 1 and final_scores[i] > 0.5:
                 image = vis(
