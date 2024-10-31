@@ -22,15 +22,18 @@ class ModelUpdater(GitHubLatestReleaseModelUpdater):
         return info
 
 
+OWNER = "nkxingxh"
+REPO = "NailongDetection"
+
 model_path = ModelUpdater(
-    "nkxingxh",
-    "NailongDetection",
+    OWNER,
+    REPO,
     lambda x: x.endswith(model_filename_sfx),
 ).get()
 
 labels_path = GitHubLatestReleaseModelUpdater(
-    "nkxingxh",
-    "NailongDetection",
+    OWNER,
+    REPO,
     lambda x: x == "labels.txt",
 ).get()
 labels = labels_path.read_text("u8").splitlines()
