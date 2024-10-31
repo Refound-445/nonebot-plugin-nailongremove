@@ -3,6 +3,7 @@ from typing import Awaitable, Callable, Dict, TypeVar
 from typing_extensions import TypeAlias
 
 from nonebot.adapters import Bot as BaseBot, Event as BaseEvent
+from nonebot.drivers import Request
 
 Muter: TypeAlias = Callable[[BaseBot, BaseEvent, int], Awaitable[None]]
 MT = TypeVar("MT", bound=Muter)
@@ -90,6 +91,33 @@ async def red(bot: BaseBot, ev: BaseEvent, seconds: int):
         await bot.mute_member(int(ev.peerUin), int(ev.senderUin), duration=seconds)
     else:
         await bot.unmute_member(int(ev.peerUin), int(ev.senderUin))
+
+
+@muter("Satori")
+async def satori(bot: BaseBot, ev: BaseEvent, seconds: int):
+    from nonebot.adapters.satori import Bot
+    from nonebot.adapters.satori.event import (
+        PublicMessageCreatedEvent,
+        PublicMessageUpdatedEvent,
+    )
+
+    if not (
+        isinstance(bot, Bot)
+        and isinstance(ev, (PublicMessageCreatedEvent, PublicMessageUpdatedEvent))
+        and ev.guild
+    ):
+        raise TypeError("Unsupported bot or event type")
+
+    req = Request(
+        "POST",
+        bot.info.api_base / "guild.member.mute",
+        json={
+            "guild_id": ev.guild.id,
+            "user_id": ev.user.id,
+            "duration": seconds * 1000,
+        },
+    )
+    await bot._request(req)  # noqa: SLF001
 
 
 @muter("Telegram")
