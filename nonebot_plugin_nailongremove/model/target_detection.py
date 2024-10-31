@@ -77,7 +77,7 @@ def check_image(image: np.ndarray) -> "CheckResult":
     has = any(
         True
         for c, s in zip(final_cls_inds, final_scores)
-        if c == 1 and s >= config.nailong_model1_score
+        if labels[c] == "nailong" and s >= config.nailong_model1_score
     )
     if has:
         image = vis(
