@@ -17,7 +17,7 @@ ModelVersionGetter: TypeAlias = Callable[
 
 
 def get_github():
-    return GitHub(config.nailong_github_token)
+    return GitHub(config.nailong_github_token, auto_retry=False)
 
 
 def format_github_release_download_base_url(owner: str, name: str, tag: str):
