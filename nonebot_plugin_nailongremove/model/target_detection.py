@@ -5,7 +5,7 @@ import numpy as np
 import onnxruntime
 
 from ..config import config
-from .update import GitHubLatestReleaseModelUpdater, ModelInfo
+from .update import GitHubLatestReleaseModelUpdater, ModelInfo, UpdaterGroup
 from .yolox_utils import demo_postprocess, multiclass_nms, preprocess, vis
 
 if TYPE_CHECKING:
@@ -25,16 +25,17 @@ class ModelUpdater(GitHubLatestReleaseModelUpdater):
 OWNER = "nkxingxh"
 REPO = "NailongDetection"
 
-model_path = ModelUpdater(
-    OWNER,
-    REPO,
-    lambda x: x.endswith(model_filename_sfx),
-).get()
-
-labels_path = GitHubLatestReleaseModelUpdater(
-    OWNER,
-    REPO,
-    lambda x: x == "labels.txt",
+model_path, labels_path = UpdaterGroup(
+    ModelUpdater(
+        OWNER,
+        REPO,
+        lambda x: x.endswith(model_filename_sfx),
+    ),
+    GitHubLatestReleaseModelUpdater(
+        OWNER,
+        REPO,
+        lambda x: x == "labels.txt",
+    ),
 ).get()
 labels = labels_path.read_text("u8").splitlines()
 

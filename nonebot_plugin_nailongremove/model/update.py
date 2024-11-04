@@ -175,18 +175,22 @@ class ModelUpdater(ABC):
                 self.save_local_ver(info, clear=True)
             raise
 
-    def _get(self) -> Path:
-        if (not config.nailong_auto_update_model) and (local := self.find_from_local()):
+    def _get(self, force_update: bool = False) -> Path:
+        if (
+            (not force_update)
+            and (not config.nailong_auto_update_model)
+            and (local := self.find_from_local())
+        ):
             logger.info("Update skipped")
             return local
 
         try:
             info = self.get_info()
         except Exception as e:
-            if not (local := self.find_from_local()):
+            if force_update or (not (local := self.find_from_local())):
                 raise
             logger.error(
-                f"Failed to get model info for {type(self).__name__}, skipping update: "
+                f"Failed to get model info in {type(self).__name__}, skipping update: "
                 f"{type(e).__name__}: {e}",
             )
             logger.debug("Stacktrace")
@@ -213,7 +217,7 @@ class ModelUpdater(ABC):
             try:
                 self.download(info)
             except Exception as e:
-                if not (local := self.find_from_local()):
+                if force_update or (not (local := self.find_from_local())):
                     raise
                 logger.error(
                     f"Failed to update model, skipping: {type(e).__name__}: {e}",
@@ -225,8 +229,8 @@ class ModelUpdater(ABC):
 
         return model_path
 
-    def get(self):
-        p = self._get()
+    def get(self, force_update: bool = False):
+        p = self._get(force_update)
         logger.info(f"Using model {p.name}")
         return p
 
@@ -328,3 +332,13 @@ class GitHubLatestReleaseModelUpdater(GitHubModelUpdater):
             f"{tag_name}-{asset.updated_at.strftime(TIME_FORMAT_TEMPLATE)}",
             None,
         )
+
+
+# 联动更新，还没有实现检查更新失败时使用本地文件的逻辑，因为没想到好的解决办法
+class UpdaterGroup:
+    def __init__(self, *updaters: ModelUpdater) -> None:
+        self.updaters = updaters
+
+    def get(self):
+        force_update = config.nailong_auto_update_model
+        return tuple(u.get(force_update) for u in self.updaters)
