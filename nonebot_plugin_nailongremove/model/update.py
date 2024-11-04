@@ -290,10 +290,11 @@ class GitHubLatestReleaseModelUpdater(GitHubModelUpdater):
     @override
     def get_info(self) -> ModelInfo[None]:
         ret = self.github.rest.repos.get_latest_release(self.owner, self.repo)
+        tag_name = ret.parsed_data.tag_name
         asset = next(x for x in ret.parsed_data.assets if self.filename_checker(x.name))
         return ModelInfo(
             self.format_download_url(ret.parsed_data.tag_name, asset.name),
             asset.name,
-            asset.updated_at.strftime(TIME_FORMAT_TEMPLATE),
+            f"{tag_name}-{asset.updated_at.strftime(TIME_FORMAT_TEMPLATE)}",
             None,
         )
