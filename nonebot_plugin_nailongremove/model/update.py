@@ -115,6 +115,8 @@ class ModelUpdater(ABC):
             path = self.get_path(info.filename)
             if not (p := path.parent).exists():
                 p.mkdir(parents=True)
+            if path.exists():
+                path.unlink()
             tmp_path.rename(path)
 
     def validate(self, path: Path, info: ModelInfo) -> Any:  # noqa: ARG002
