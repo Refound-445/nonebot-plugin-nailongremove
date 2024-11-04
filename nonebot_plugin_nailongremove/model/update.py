@@ -1,3 +1,4 @@
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
@@ -26,14 +27,6 @@ def get_github():
     return ProxyGitHub(config.nailong_github_token, auto_retry=False)
 
 
-def get_ver_filename(filename: str) -> str:
-    return f"{filename}.ver.txt"
-
-
-def get_ver_path(filename: str) -> Path:
-    return config.nailong_model_dir / get_ver_filename(filename)
-
-
 def progress_download(resp: httpx.Response, file_path: Path):
     if not (file_dir := file_path.parent).exists():
         file_dir.mkdir(parents=True)
@@ -56,6 +49,12 @@ def github_progress_download(github: GitHub, file_path: Path, *args, **kwargs):
         return progress_download(resp.raise_for_status(), file_path)
 
 
+def create_parent_dir(path: Path, create: bool = True):
+    if create and (not (p := path.parent).exists()):
+        p.mkdir(parents=True)
+    return path
+
+
 @dataclass
 class ModelInfo(Generic[T]):
     download_url: str
@@ -71,15 +70,25 @@ class ModelUpdater(ABC):
     @abstractmethod
     def get_info(self) -> ModelInfo: ...
 
+    def get_path(self, filename: str, create_parent: bool = True) -> Path:
+        return create_parent_dir(config.nailong_model_dir / filename, create_parent)
+
+    def get_ver_path(self, filename: str, create_parent: bool = True) -> Path:
+        return self.get_path(filename, create_parent).with_name(f"{filename}.ver.txt")
+
+    def get_tmp_path(self, filename: str, create_parent: bool = True) -> Path:
+        return self.get_path(f"{filename}-{time.time() * 1000:.0f}.tmp", create_parent)
+
     def check_local_ver(self, info: ModelInfo) -> Optional[str]:
-        if (config.nailong_model_dir / info.filename).exists() and (
-            ver_path := get_ver_path(info.filename)
-        ).exists():
+        if (
+            self.get_path(info.filename).exists()
+            and (ver_path := self.get_ver_path(info.filename)).exists()
+        ):
             return ver_path.read_text(encoding="u8").strip()
         return None
 
     def save_local_ver(self, info: ModelInfo, clear: bool = False):
-        p = get_ver_path(info.filename)
+        p = self.get_ver_path(info.filename)
         if clear:
             p.unlink(missing_ok=True)
         else:
@@ -95,29 +104,40 @@ class ModelUpdater(ABC):
         )
 
     def download(self, info: ModelInfo):
-        tmp_path = config.nailong_model_dir / f"{info.filename}.{info.version}"
+        tmp_path = self.get_tmp_path(info.filename)
         try:
             self._download(tmp_path, info)
         except Exception:
             tmp_path.unlink(missing_ok=True)
             raise
         else:
-            tmp_path.rename(config.nailong_model_dir / info.filename)
+            self.validate_with_unlink(tmp_path, info, clear_ver=False)
+            path = self.get_path(info.filename)
+            if not (p := path.parent).exists():
+                p.mkdir(parents=True)
+            tmp_path.rename(path)
 
     def validate(self, path: Path, info: ModelInfo) -> Any:  # noqa: ARG002
         """please raise Error when validation failed"""
         return
 
-    def validate_with_unlink(self, path: Path, info: ModelInfo) -> Any:
+    def validate_with_unlink(
+        self,
+        path: Path,
+        info: ModelInfo,
+        clear_ver: bool = True,
+    ) -> Any:
         try:
             return self.validate(path, info)
         except Exception:
             path.unlink(missing_ok=True)
-            self.save_local_ver(info, clear=True)
+            if clear_ver:
+                self.save_local_ver(info, clear=True)
             raise
 
     def _get(self) -> Path:
         if (not config.nailong_auto_update_model) and (local := self.find_from_local()):
+            logger.info("Update skipped")
             return local
 
         try:
@@ -132,7 +152,7 @@ class ModelUpdater(ABC):
             logger.debug("Stacktrace")
             return local
 
-        model_path = config.nailong_model_dir / info.filename
+        model_path = self.get_path(info.filename)
         local_ver = self.check_local_ver(info)
 
         if model_path.exists():
@@ -140,7 +160,8 @@ class ModelUpdater(ABC):
                 self.validate_with_unlink(model_path, info)
             except Exception as e:
                 logger.error(
-                    f"Validation for model {info.filename} failed, re-downloading: "
+                    f"Validation for model {info.filename} failed, "
+                    f"deleted, re-downloading: "
                     f"{type(e).__name__}: {e}",
                 )
 
@@ -149,9 +170,18 @@ class ModelUpdater(ABC):
             logger.info(
                 f"Updating model {info.filename} {from_tip}to version {info.version}",
             )
-            self.download(info)
-            self.save_local_ver(info)
-            self.validate_with_unlink(model_path, info)
+            try:
+                self.download(info)
+            except Exception as e:
+                if not (local := self.find_from_local()):
+                    raise
+                logger.error(
+                    f"Failed to update model, skipping: {type(e).__name__}: {e}",
+                )
+                logger.debug("Stacktrace")
+                return local
+            else:
+                self.save_local_ver(info)
 
         return model_path
 
