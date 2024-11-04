@@ -2,7 +2,7 @@ import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Generic, Optional, TypeVar
+from typing import Any, Callable, Generic, List, Optional, TypeVar, Union
 from typing_extensions import override
 
 import httpx
@@ -55,6 +55,40 @@ def create_parent_dir(path: Path, create: bool = True):
     return path
 
 
+def find_file(
+    path: Path,
+    checker: Union[Callable[[Path], bool], str, None] = None,
+    recursive: bool = False,
+    last_modified: bool = True,
+) -> Optional[Path]:
+    if isinstance(checker, str) and checker:
+        if (p := path / checker).exists():
+            return p
+        if not recursive:
+            return None
+
+    checker = (
+        (checker if callable(checker) else (lambda x: x.name == checker))
+        if checker
+        else None
+    )
+
+    def iterator(p: Path):
+        child_dirs: List[Path] = []
+        for x in p.iterdir():
+            if x.is_dir() and recursive:
+                child_dirs.append(x)
+            elif x.is_file() and ((not checker) or checker(x)):
+                yield x
+        for ch in child_dirs:
+            yield from iterator(ch)
+
+    it = iterator(path)
+    if last_modified:
+        return max(it, key=lambda x: x.stat().st_mtime, default=None)
+    return next(it, None)
+
+
 @dataclass
 class ModelInfo(Generic[T]):
     download_url: str
@@ -70,8 +104,12 @@ class ModelUpdater(ABC):
     @abstractmethod
     def get_info(self) -> ModelInfo: ...
 
+    @property
+    def root_dir(self) -> Path:
+        return config.nailong_model_dir
+
     def get_path(self, filename: str, create_parent: bool = True) -> Path:
-        return create_parent_dir(config.nailong_model_dir / filename, create_parent)
+        return create_parent_dir(self.root_dir / filename, create_parent)
 
     def get_ver_path(self, filename: str, create_parent: bool = True) -> Path:
         return self.get_path(filename, create_parent).with_name(f"{filename}.ver.txt")
@@ -232,9 +270,7 @@ class GitHubRepoModelUpdater(GitHubModelUpdater):
 
     @override
     def find_from_local(self) -> Optional[Path]:
-        if (p := (config.nailong_model_dir / self.filename)).exists():
-            return p
-        return None
+        return find_file(self.root_dir, self.filename)
 
     @override
     def get_info(self) -> ModelInfo[None]:
@@ -262,12 +298,12 @@ class GitHubLatestReleaseModelUpdater(GitHubModelUpdater):
         self,
         owner: str,
         repo: str,
-        filename_checker: Optional[Callable[[str], bool]] = None,
+        local_filename_checker: Optional[Callable[[str], bool]] = None,
     ) -> None:
         super().__init__()
         self.owner = owner
         self.repo = repo
-        self.filename_checker = filename_checker or (lambda _: True)
+        self.local_filename_checker = local_filename_checker or (lambda _: True)
 
     def format_download_url(self, tag: str, filename: str) -> str:
         return (
@@ -277,21 +313,15 @@ class GitHubLatestReleaseModelUpdater(GitHubModelUpdater):
 
     @override
     def find_from_local(self) -> Optional[Path]:
-        fs = [
-            x
-            for x in config.nailong_model_dir.iterdir()
-            if x.is_file() and self.filename_checker(x.name)
-        ]
-        if fs:
-            fs.sort(key=lambda x: x.stat().st_mtime, reverse=True)
-            return fs[0]
-        return None
+        return find_file(self.root_dir, lambda p: self.local_filename_checker(p.name))
 
     @override
     def get_info(self) -> ModelInfo[None]:
         ret = self.github.rest.repos.get_latest_release(self.owner, self.repo)
         tag_name = ret.parsed_data.tag_name
-        asset = next(x for x in ret.parsed_data.assets if self.filename_checker(x.name))
+        asset = next(
+            x for x in ret.parsed_data.assets if self.local_filename_checker(x.name)
+        )
         return ModelInfo(
             self.format_download_url(ret.parsed_data.tag_name, asset.name),
             asset.name,
