@@ -108,11 +108,10 @@ def get_avg_duration(image: Img.Image) -> float:
     if not getattr(image, "is_animated", False):
         return 0
     total_duration = 0
-    n_frames = getattr(image, "n_frames", 1)
-    for i in range(n_frames):
-        image.seek(i)
-        total_duration += image.info.get("duration", 20)
-    return total_duration / n_frames / 1000
+    frames = list(ImageSequence.Iterator(image))
+    for frame in frames:
+        total_duration += frame.info.get("duration", 20)
+    return total_duration / len(frames) / 1000
 
 
 @repack_saver(PilImageFrameSource)
