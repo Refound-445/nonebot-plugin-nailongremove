@@ -14,7 +14,7 @@ from .utils.common import CheckResult, CheckSingleResult, race_check
 from .utils.update import GitHubLatestReleaseModelUpdater, ModelInfo, UpdaterGroup
 from .utils.yolox import demo_postprocess, multiclass_nms, preprocess, vis
 
-model_filename_sfx = f"_{config.nailong_model1_type}.onnx"
+model_filename_sfx = f"_{config.nailong_model1_type.value}.onnx"
 
 
 class ModelUpdater(GitHubLatestReleaseModelUpdater):
@@ -54,7 +54,7 @@ session = onnxruntime.InferenceSession(
         else ["CPUExecutionProvider"]
     ),
 )
-input_shape = config.nailong_model1_yolox_size
+input_shape = config.nailong_model1_yolox_size or config.nailong_model1_type.yolox_size
 
 
 @dataclass
@@ -129,7 +129,7 @@ async def check_single(frame: np.ndarray) -> CheckSingleResult[FrameInfo]:
 
 async def check(source: FrameSource) -> CheckResult:
     extra_vars = {}
-    if config.nailong_checked_result_all:
+    if config.nailong_check_all_frames:
         sem = asyncio.Semaphore(config.nailong_concurrency)
         results = asyncio.gather(
             *(with_semaphore(sem)(check_single)(frame) for frame in source),

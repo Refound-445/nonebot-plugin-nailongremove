@@ -1,7 +1,8 @@
-from enum import Enum
+from enum import Enum, auto
 from pathlib import Path
 from typing import List, Optional, Tuple
 
+from cookit import StrEnum
 from nonebot import get_plugin_config
 from pydantic import BaseModel, Field
 
@@ -9,6 +10,18 @@ from pydantic import BaseModel, Field
 class ModelType(int, Enum):
     CLASSIFICATION = 0
     TARGET_DETECTION = 1
+
+
+class Model1Type(StrEnum):
+    TINY = auto()
+    M = auto()
+
+    @property
+    def yolox_size(self) -> Tuple[int, int]:
+        return {
+            Model1Type.TINY: (416, 416),
+            Model1Type.M: (640, 640),
+        }[self]
 
 
 class Config(BaseModel):
@@ -25,7 +38,7 @@ class Config(BaseModel):
     nailong_mute_seconds: int = 0
     nailong_tip: str = "本群禁止发送奶龙！"
     nailong_failed_tip: str = "{:Reply($message_id)}呜，不要发奶龙了嘛 🥺 👉👈"
-    nailong_checked_result_all: bool = False
+    nailong_check_all_frames: bool = False
 
     nailong_model_dir: Path = Field(
         default_factory=lambda: Path.cwd() / "data" / "nailongremove",
@@ -35,8 +48,8 @@ class Config(BaseModel):
     nailong_concurrency: int = 1
     nailong_onnx_try_to_use_gpu: bool = True
 
-    nailong_model1_yolox_size: Tuple[int, int] = (416, 416)
-    nailong_model1_type: str = "tiny"
+    nailong_model1_type: Model1Type = Model1Type.TINY
+    nailong_model1_yolox_size: Optional[Tuple[int, int]] = None
     nailong_model1_score: float = 0.5
 
     nailong_github_token: Optional[str] = None
