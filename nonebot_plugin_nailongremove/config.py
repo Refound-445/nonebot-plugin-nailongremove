@@ -25,6 +25,7 @@ class Config(BaseModel):
     nailong_mute_seconds: int = 0
     nailong_tip: str = "本群禁止发送奶龙！"
     nailong_failed_tip: str = "{:Reply($message_id)}呜，不要发奶龙了嘛 🥺 👉👈"
+    nailong_checked_result_all: bool = False
 
     nailong_model_dir: Path = Field(
         default_factory=lambda: Path.cwd() / "data" / "nailongremove",

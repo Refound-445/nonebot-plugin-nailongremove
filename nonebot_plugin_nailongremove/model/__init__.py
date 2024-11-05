@@ -1,10 +1,8 @@
-from typing import Awaitable, Callable, Literal, NoReturn, Tuple, Union
-from typing_extensions import TypeAlias
-
-import numpy as np
-from nonebot.utils import run_sync
+from typing import Awaitable, Callable, NoReturn
 
 from ..config import ModelType, config
+from ..frame_source import FrameSource
+from .common import CheckResult as CheckResult
 
 
 def raise_extra_import_error(e: BaseException, group: str) -> NoReturn:
@@ -15,25 +13,16 @@ def raise_extra_import_error(e: BaseException, group: str) -> NoReturn:
     ) from e
 
 
-CheckResultTuple: TypeAlias = Union[
-    Tuple[bool, None],
-    Tuple[Literal[True], np.ndarray],
-]
-CheckResult: TypeAlias = Union[bool, CheckResultTuple]
-
-check_image_sync: Callable[[np.ndarray], CheckResult]
+check: Callable[[FrameSource], Awaitable[CheckResult]]
 
 if config.nailong_model is ModelType.CLASSIFICATION:
-    from .classification import check_image as check_image_sync
+    from .classification import check as check
 
 elif config.nailong_model is ModelType.TARGET_DETECTION:
     try:
-        from .target_detection import check_image as check_image_sync
+        from .target_detection import check as check
     except ImportError as e:
         raise_extra_import_error(e, "model1")
 
 else:
     raise ValueError("Invalid model type")
-
-
-check_image: Callable[[np.ndarray], Awaitable[CheckResult]] = run_sync(check_image_sync)

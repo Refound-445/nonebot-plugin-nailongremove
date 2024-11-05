@@ -1,15 +1,15 @@
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import cv2
 import numpy as np
 import torch
+from nonebot.utils import run_sync
 from torch import nn
 from torchvision import transforms
 
+from ..frame_source import FrameSource
+from .common import CheckResult, CheckSingleResult, race_check
 from .update import GitHubRepoModelUpdater
-
-if TYPE_CHECKING:
-    from . import CheckResult
 
 model_path = GitHubRepoModelUpdater(
     "spawner1145",
@@ -33,9 +33,10 @@ if cuda_available:
 SIZE = 224
 
 
-def check_image(image: np.ndarray) -> "CheckResult":
+@run_sync
+def check_single(image: np.ndarray) -> CheckSingleResult[None]:
     if image.shape[0] < SIZE or image.shape[1] < SIZE:
-        return False
+        return CheckSingleResult(ok=False, extra=None)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = cv2.resize(image, (SIZE, SIZE))
     image = transform(image)
@@ -43,4 +44,9 @@ def check_image(image: np.ndarray) -> "CheckResult":
     with torch.no_grad():
         output = model(image.to(device))  # type: ignore
         _, pred = torch.max(output, 1)
-        return pred.item() == 1
+        return CheckSingleResult(ok=pred.item() == 1, extra=None)
+
+
+async def check(frames: FrameSource):
+    res = await race_check(check_single, frames)
+    return CheckResult(ok=bool(res))
