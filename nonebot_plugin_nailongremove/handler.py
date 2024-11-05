@@ -13,7 +13,7 @@ from nonebot.typing import T_State
 from nonebot_plugin_alconna.builtins.uniseg.market_face import MarketFace
 from nonebot_plugin_alconna.uniseg import Image, UniMessage, UniMsg, image_fetch
 from nonebot_plugin_uninfo import QryItrface, Uninfo
-from PIL import Image as PilImage
+from PIL import Image as PilImage, ImageSequence
 
 from .config import config
 from .model import CheckResultTuple, check_image
@@ -24,18 +24,10 @@ T = TypeVar("T")
 
 def transform_image(image_data: bytes) -> Iterator[np.ndarray]:
     image = PilImage.open(io.BytesIO(image_data))
-    image = image.convert("RGB")
-
-    def process_frame(index: int = 0) -> np.ndarray:
-        image.seek(index)
-        image_array = np.array(image)
-        # 转换为BGR格式
-        if len(image_array.shape) == 3 and image_array.shape[2] == 3:
-            image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
-        return image_array
-
-    frame_num: int = getattr(image, "n_frames", 1)
-    yield from (process_frame(i) for i in range(frame_num))
+    for frame in ImageSequence.Iterator(image):
+        image_array = np.array(frame.convert("RGB"))
+        image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
+        yield image_array
 
 
 def judge_list(lst: Iterable[T], val: T, blacklist: bool) -> bool:
