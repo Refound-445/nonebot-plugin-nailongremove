@@ -10,7 +10,7 @@ from githubkit import GitHub
 from nonebot import logger
 from tqdm import tqdm
 
-from ..config import config
+from ...config import config
 
 T = TypeVar("T")
 

@@ -8,7 +8,7 @@ from nonebot_plugin_alconna.builtins.uniseg.market_face import MarketFace
 from nonebot_plugin_alconna.uniseg import Image, UniMessage, UniMsg
 from nonebot_plugin_uninfo import QryItrface, Uninfo
 
-from nonebot_plugin_nailongremove.frame_source import iter_frames_in_message
+from nonebot_plugin_nailongremove.frame_source import iter_sources_in_message
 
 from .config import config
 from .model import check
@@ -84,9 +84,9 @@ nailong = on_message(rule=Rule(nailong_rule), priority=config.nailong_priority)
 
 @nailong.handle()
 async def handle_function(bot: BaseBot, ev: BaseEvent, msg: UniMsg, session: Uninfo):
-    async for frames, seg in iter_frames_in_message(msg):
+    async for source, seg in iter_sources_in_message(msg):
         try:
-            check_res = await check(frames)
+            check_res = await check(source)
         except Exception:
             logger.exception(f"Failed to check {seg!r}")
             continue

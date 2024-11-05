@@ -5,8 +5,8 @@ from typing_extensions import TypeAlias
 
 import numpy as np
 
-from ..config import config
-from ..frame_source import FrameSource
+from ...config import config
+from ...frame_source import FrameSource
 
 T = TypeVar("T")
 

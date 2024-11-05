@@ -2,7 +2,7 @@ from typing import Awaitable, Callable, NoReturn
 
 from ..config import ModelType, config
 from ..frame_source import FrameSource
-from .common import CheckResult as CheckResult
+from .utils.common import CheckResult as CheckResult
 
 
 def raise_extra_import_error(e: BaseException, group: str) -> NoReturn:

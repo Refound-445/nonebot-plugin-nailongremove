@@ -180,7 +180,7 @@ async def extract_source(seg: Segment) -> FrameSource:
     return await source_extractors[k](seg)
 
 
-async def iter_frames_in_message(
+async def iter_sources_in_message(
     message: UniMessage,
 ) -> AsyncIterator[Tuple[FrameSource, Segment]]:
     for seg in message:

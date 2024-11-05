@@ -10,9 +10,9 @@ from nonebot.utils import run_sync
 
 from ..config import config
 from ..frame_source import FrameSource, repack_save
-from .common import CheckResult, CheckSingleResult, race_check
-from .update import GitHubLatestReleaseModelUpdater, ModelInfo, UpdaterGroup
-from .yolox_utils import demo_postprocess, multiclass_nms, preprocess, vis
+from .utils.common import CheckResult, CheckSingleResult, race_check
+from .utils.update import GitHubLatestReleaseModelUpdater, ModelInfo, UpdaterGroup
+from .utils.yolox import demo_postprocess, multiclass_nms, preprocess, vis
 
 model_filename_sfx = f"_{config.nailong_model1_type}.onnx"
 
@@ -127,25 +127,25 @@ async def check_single(frame: np.ndarray) -> CheckSingleResult[FrameInfo]:
     return CheckSingleResult(ok=res.ok, extra=FrameInfo(frame, res.extra))
 
 
-async def check(frames: FrameSource) -> CheckResult:
+async def check(source: FrameSource) -> CheckResult:
     extra_vars = {}
     if config.nailong_checked_result_all:
         sem = asyncio.Semaphore(config.nailong_concurrency)
         results = asyncio.gather(
-            *(with_semaphore(sem)(check_single)(frame) for frame in frames),
+            *(with_semaphore(sem)(check_single)(frame) for frame in source),
         )
         ok = any(r.ok for r in results)
         if ok:
             extra_vars["$checked_result"] = await repack_save(
-                frames,
+                source,
                 (r.extra.vis() for r in results),
             )
     else:
-        res = await race_check(check_single, frames)
+        res = await race_check(check_single, source)
         ok = bool(res)
         if res:
             extra_vars["$checked_result"] = await repack_save(
-                frames,
+                source,
                 iter((res.extra.vis(),)),
             )
     return CheckResult(ok, extra_vars)

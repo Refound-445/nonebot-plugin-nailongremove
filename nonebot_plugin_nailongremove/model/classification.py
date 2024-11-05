@@ -8,8 +8,8 @@ from torch import nn
 from torchvision import transforms
 
 from ..frame_source import FrameSource
-from .common import CheckResult, CheckSingleResult, race_check
-from .update import GitHubRepoModelUpdater
+from .utils.common import CheckResult, CheckSingleResult, race_check
+from .utils.update import GitHubRepoModelUpdater
 
 model_path = GitHubRepoModelUpdater(
     "spawner1145",
@@ -47,6 +47,6 @@ def check_single(image: np.ndarray) -> CheckSingleResult[None]:
         return CheckSingleResult(ok=pred.item() == 1, extra=None)
 
 
-async def check(frames: FrameSource):
-    res = await race_check(check_single, frames)
+async def check(source: FrameSource):
+    res = await race_check(check_single, source)
     return CheckResult(ok=bool(res))
