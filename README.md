@@ -149,7 +149,7 @@ plugins = [
 |  `NAILONG_CHECK_ALL_FRAMES`   |  否  |                             `False`                              |                                                            使用模型 1 时是否检查图片中的所有帧，启用该项后消息模板中的 `$checked_result` 变量当原图为动图时会变为动图                                                             |
 |       **模型通用配置**        |      |                                                                  |                                                                                                                                                                                                                                   |
 |      `NAILONG_MODEL_DIR`      |  否  |                      `./data/nailongremove`                      |                                                                                                          模型的下载位置                                                                                                           |
-|        `NAILONG_MODEL`        |  否  |                               `0`                                |                                                                                                 选择需要加载的模型，可用模型见下                                                                                                  |
+|        `NAILONG_MODEL`        |  否  |                               `1`                                |                                                                                                 选择需要加载的模型，可用模型见下                                                                                                  |
 |  `NAILONG_AUTO_UPDATE_MODEL`  |  否  |                              `True`                              |                                                                                                         是否自动更新模型                                                                                                          |
 |     `NAILONG_CONCURRENCY`     |  否  |                               `1`                                |                                                                                       当图片为动图时，针对该图片并发识别图片帧的最大并发数                                                                                        |
 | `NAILONG_ONNX_TRY_TO_USE_GPU` |  否  |                              `True`                              |                                                          加载 onnx 模型时是否尝试使用 GPU，如果失败则会显示一串警告但是对插件并无影响，如果不想看见警告关闭此配置项即可                                                           |
@@ -196,6 +196,7 @@ plugins = [
 - 现在模型 1 的输入大小可以根据模型类型自动配置了，但是如果配置项指定了那么会优先使用
 - 支持处理含有其他标签的图片了，部分配置项支持根据标签自定义对应值
 - 增加用户黑名单
+- 默认模型调整至 1
 
 ### 2.2.1
 
