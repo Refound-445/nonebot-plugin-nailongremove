@@ -304,4 +304,4 @@ nb plugin update nonebot-plugin-nailongremove
 
 ### 常见问题
 
-常见问题请跳转至[issues](https://github.com/Refound-445/nonebot-plugin-nailongremove/issues](https://github.com/Refound-445/nonebot-plugin-nailongremove/issues?q=is%3Aissue+is%3Aclosed)
+常见问题请跳转至[issues](https://github.com/Refound-445/nonebot-plugin-nailongremove/issues?q=is%3Aissue+is%3Aclosed)
