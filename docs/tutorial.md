@@ -301,3 +301,7 @@ NAILONG_TIP='
 ```shell
 nb plugin update nonebot-plugin-nailongremove
 ```
+
+### 常见问题
+
+常见问题请跳转至[#issues](https://github.com/Refound-445/nonebot-plugin-nailongremove/issues)
