@@ -4,13 +4,11 @@ from nonebot import logger, on_message
 from nonebot.adapters import Bot as BaseBot, Event as BaseEvent
 from nonebot.permission import SUPERUSER
 from nonebot.rule import Rule
-from nonebot_plugin_alconna.builtins.uniseg.market_face import MarketFace
-from nonebot_plugin_alconna.uniseg import Image, UniMessage, UniMsg
+from nonebot_plugin_alconna.uniseg import UniMessage, UniMsg
 from nonebot_plugin_uninfo import QryItrface, Uninfo
 
-from nonebot_plugin_nailongremove.frame_source import iter_sources_in_message
-
 from .config import DEFAULT_LABEL, config
+from .frame_source import iter_sources_in_message, source_extractors
 from .model import check
 from .uniapi import mute, recall
 
@@ -46,6 +44,14 @@ async def nailong_rule(
     return (
         # check if it's a group chat
         bool(session.member)  # this prop only exists in group chats
+        # user blacklist
+        and (session.user.id not in config.nailong_user_blacklist)
+        # scene blacklist or whitelist
+        and judge_list(
+            config.nailong_list_scenes,
+            session.scene_path,
+            config.nailong_blacklist,
+        )
         # bypass superuser
         and ((not config.nailong_bypass_superuser) or (not await SUPERUSER(bot, event)))
         # bypass group admin
@@ -53,14 +59,8 @@ async def nailong_rule(
             (not config.nailong_bypass_admin)
             or ((not session.member.role) or session.member.role.level <= 1)
         )
-        # msg has image
-        and ((Image in msg) or (MarketFace in msg))
-        # blacklist or whitelist
-        and judge_list(
-            config.nailong_list_scenes,
-            session.scene_path,
-            config.nailong_blacklist,
-        )
+        # msg has supported seg
+        and (any(True for x in msg if type(x) in source_extractors))
         # self is admin
         and (
             (not config.nailong_need_admin)

@@ -35,6 +35,7 @@ class Config(BaseModel):
     nailong_need_admin: bool = False
     nailong_list_scenes: List[str] = Field(default_factory=list)
     nailong_blacklist: bool = True
+    nailong_user_blacklist: List[str] = Field(default_factory=list)
     nailong_priority: int = 100
 
     nailong_recall: bool = True
