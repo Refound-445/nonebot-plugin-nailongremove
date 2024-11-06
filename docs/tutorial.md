@@ -162,7 +162,7 @@ nb plugin install nonebot-plugin-nailongremove
 ![11](./assets/11.png)  
 ![12](./assets/12.png)
 
-如果想要使用模型 1，按照下面的操作来安装额外依赖
+如果想要使用模型 0，按照下面的操作来安装额外依赖
 
 先进入虚拟环境，进入虚拟环境后命令行左侧应该会多出来你虚拟环境的名字
 
@@ -173,7 +173,7 @@ nb sh
 再安装额外依赖
 
 ```shell
-pip install "nonebot-plugin-nailongremove[model1]"
+pip install "nonebot-plugin-nailongremove[model0]"
 ```
 
 安装过程如图
@@ -274,6 +274,25 @@ NAILONG_MODEL=1
 ```
 
 ![16](./assets/16.png)
+
+多行配置项例子：
+
+```properties
+NAILONG_MODEL1_SCORE='
+{
+  "nailong": 0.75,
+  "htgt": 0.75
+}
+'
+NAILONG_TIP='
+{
+  "nailong": "本群禁止发奶龙！",
+  "htgt": "疑似奶龙尸块"
+}
+'
+```
+
+![17](./assets/17.png)
 
 ### 更新插件
 

@@ -7,6 +7,7 @@ from nonebot.utils import run_sync
 from torch import nn
 from torchvision import transforms
 
+from ..config import DEFAULT_LABEL
 from ..frame_source import FrameSource
 from .utils.common import CheckResult, CheckSingleResult, race_check
 from .utils.update import GitHubRepoModelUpdater
@@ -36,7 +37,7 @@ SIZE = 224
 @run_sync
 def check_single(image: np.ndarray) -> CheckSingleResult[None]:
     if image.shape[0] < SIZE or image.shape[1] < SIZE:
-        return CheckSingleResult(ok=False, extra=None)
+        return CheckSingleResult.not_ok(None)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = cv2.resize(image, (SIZE, SIZE))
     image = transform(image)
@@ -44,9 +45,9 @@ def check_single(image: np.ndarray) -> CheckSingleResult[None]:
     with torch.no_grad():
         output = model(image.to(device))  # type: ignore
         _, pred = torch.max(output, 1)
-        return CheckSingleResult(ok=pred.item() == 1, extra=None)
+        return CheckSingleResult(ok=pred.item() == 1, label=DEFAULT_LABEL, extra=None)
 
 
 async def check(source: FrameSource):
     res = await race_check(check_single, source)
-    return CheckResult(ok=bool(res))
+    return CheckResult(ok=bool(res), label=res.label if res else None)

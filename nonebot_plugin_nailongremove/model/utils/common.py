@@ -14,13 +14,23 @@ T = TypeVar("T")
 @dataclass
 class CheckSingleResult(Generic[T]):
     ok: bool
+    label: Optional[str]
     extra: T
+
+    @classmethod
+    def not_ok(cls, extra: T):
+        return cls(ok=False, label=None, extra=extra)
 
 
 @dataclass
 class CheckResult:
     ok: bool
+    label: Optional[str]
     extra_vars: Dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def not_ok(cls):
+        return cls(ok=False, label=None, extra_vars={})
 
 
 FrameChecker: TypeAlias = Callable[[np.ndarray], Awaitable[CheckSingleResult[T]]]
@@ -38,7 +48,7 @@ async def race_check(
             try:
                 frame = next(iterator)
             except StopIteration:
-                return CheckSingleResult(ok=False, extra=None)
+                return CheckSingleResult.not_ok(None)
             res = await checker(frame)
             if res.ok:
                 return res

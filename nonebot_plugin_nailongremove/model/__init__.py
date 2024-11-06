@@ -16,13 +16,13 @@ def raise_extra_import_error(e: BaseException, group: str) -> NoReturn:
 check: Callable[[FrameSource], Awaitable[CheckResult]]
 
 if config.nailong_model is ModelType.CLASSIFICATION:
-    from .classification import check as check
+    try:
+        from .classification import check as check
+    except ImportError as e:
+        raise_extra_import_error(e, "model0")
 
 elif config.nailong_model is ModelType.TARGET_DETECTION:
-    try:
-        from .target_detection import check as check
-    except ImportError as e:
-        raise_extra_import_error(e, "model1")
+    from .target_detection import check as check
 
 else:
     raise ValueError("Invalid model type")

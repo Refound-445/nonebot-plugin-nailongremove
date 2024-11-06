@@ -10,7 +10,7 @@ from nonebot_plugin_uninfo import QryItrface, Uninfo
 
 from nonebot_plugin_nailongremove.frame_source import iter_sources_in_message
 
-from .config import config
+from .config import DEFAULT_LABEL, config
 from .model import check
 from .uniapi import mute, recall
 
@@ -100,7 +100,10 @@ async def handle_function(bot: BaseBot, ev: BaseEvent, msg: UniMsg, session: Uni
             functions.append(lambda: mute(bot, ev, config.nailong_mute_seconds))
         punish_ok = functions and (await execute_functions_any_ok(functions))
 
-        template_str = config.nailong_tip if punish_ok else config.nailong_failed_tip
+        template_dict = config.nailong_tip if punish_ok else config.nailong_failed_tip
+        template_str = template_dict[
+            check_res.label if (check_res.label in template_dict) else DEFAULT_LABEL
+        ]
         mapping = {
             "$event": ev,
             "$target": msg.get_target(),

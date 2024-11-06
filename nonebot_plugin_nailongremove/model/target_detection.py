@@ -102,40 +102,49 @@ def _check_single(frame: np.ndarray) -> CheckSingleResult[Optional[Detections]]:
     boxes_xyxy /= ratio
     dets = multiclass_nms(boxes_xyxy, scores, nms_thr=0.45, score_thr=0.1)
     if dets is None:
-        return CheckSingleResult(ok=False, extra=None)
+        return CheckSingleResult.not_ok(None)
 
     final_boxes, final_scores, final_cls_ids = (
         dets[:, :4],  # type: ignore
         dets[:, 4],  # type: ignore
         dets[:, 5],  # type: ignore
     )
-    has = any(
-        True
-        for c, s in zip(final_cls_ids, final_scores)
-        if labels[int(c)] == "nailong" and s >= config.nailong_model1_score
-    )
-    if has:
-        return CheckSingleResult(
-            ok=True,
-            extra=Detections(final_boxes, final_scores, final_cls_ids),
-        )
-    return CheckSingleResult(ok=False, extra=None)
+    for c, s in zip(final_cls_ids, final_scores):
+        label = labels[int(c)]
+        expected = config.nailong_model1_score.get(label)
+        if (expected is not None) and s >= expected:
+            return CheckSingleResult(
+                ok=True,
+                label=label,
+                extra=Detections(final_boxes, final_scores, final_cls_ids),
+            )
+    return CheckSingleResult.not_ok(None)
 
 
 async def check_single(frame: np.ndarray) -> CheckSingleResult[FrameInfo]:
     res = await _check_single(frame)
-    return CheckSingleResult(ok=res.ok, extra=FrameInfo(frame, res.extra))
+    return CheckSingleResult(
+        ok=res.ok,
+        label=res.label,
+        extra=FrameInfo(frame, res.extra),
+    )
 
 
 async def check(source: FrameSource) -> CheckResult:
+    label = None
     extra_vars = {}
     if config.nailong_check_all_frames:
         sem = asyncio.Semaphore(config.nailong_concurrency)
-        results = asyncio.gather(
+        results = await asyncio.gather(
             *(with_semaphore(sem)(check_single)(frame) for frame in source),
         )
         ok = any(r.ok for r in results)
         if ok:
+            all_labels = {r.label for r in results if r.label}
+            label = next(
+                (x for x in config.nailong_model1_score if x in all_labels),
+                None,
+            )
             extra_vars["$checked_result"] = await repack_save(
                 source,
                 (r.extra.vis() for r in results),
@@ -144,8 +153,9 @@ async def check(source: FrameSource) -> CheckResult:
         res = await race_check(check_single, source)
         ok = bool(res)
         if res:
+            label = res.label
             extra_vars["$checked_result"] = await repack_save(
                 source,
                 iter((res.extra.vis(),)),
             )
-    return CheckResult(ok, extra_vars)
+    return CheckResult(ok, label, extra_vars)

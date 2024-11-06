@@ -1,10 +1,13 @@
 from enum import Enum, auto
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from cookit import StrEnum
+from cookit.pyd import field_validator
 from nonebot import get_plugin_config
 from pydantic import BaseModel, Field
+
+DEFAULT_LABEL = "nailong"
 
 
 class ModelType(int, Enum):
@@ -36,23 +39,51 @@ class Config(BaseModel):
 
     nailong_recall: bool = True
     nailong_mute_seconds: int = 0
-    nailong_tip: str = "本群禁止发送奶龙！"
-    nailong_failed_tip: str = "{:Reply($message_id)}呜，不要发奶龙了嘛 🥺 👉👈"
+    nailong_tip: Dict[str, str] = {
+        DEFAULT_LABEL: "本群禁止发送奶龙！",
+    }
+    nailong_failed_tip: Dict[str, str] = {
+        DEFAULT_LABEL: "{:Reply($message_id)}呜，不要发奶龙了嘛 🥺 👉👈",
+    }
     nailong_check_all_frames: bool = False
 
     nailong_model_dir: Path = Field(
         default_factory=lambda: Path.cwd() / "data" / "nailongremove",
     )
-    nailong_model: ModelType = ModelType.CLASSIFICATION
+    nailong_model: ModelType = ModelType.TARGET_DETECTION
     nailong_auto_update_model: bool = True
     nailong_concurrency: int = 1
     nailong_onnx_try_to_use_gpu: bool = True
 
     nailong_model1_type: Model1Type = Model1Type.TINY
     nailong_model1_yolox_size: Optional[Tuple[int, int]] = None
-    nailong_model1_score: float = 0.5
+    nailong_model1_score: Dict[str, Optional[float]] = {
+        DEFAULT_LABEL: 0.5,
+    }
 
     nailong_github_token: Optional[str] = None
+
+    @field_validator(
+        "nailong_tip",
+        "nailong_failed_tip",
+        "nailong_model1_score",
+        mode="before",
+    )
+    def transform_to_dict(cls, v: Any):  # noqa: N805
+        if not isinstance(v, dict):
+            return {DEFAULT_LABEL: v}
+        return v
+
+    @field_validator(
+        "nailong_tip",
+        "nailong_failed_tip",
+        # "nailong_model1_score",
+        mode="after",
+    )
+    def check_default_label_exists(cls, v: Dict[str, Any]):  # noqa: N805
+        if DEFAULT_LABEL not in v:
+            raise ValueError(f"Please ensure default label {DEFAULT_LABEL} in dict")
+        return v
 
 
 config = get_plugin_config(Config)

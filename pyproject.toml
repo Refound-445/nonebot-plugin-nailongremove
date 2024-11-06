@@ -15,13 +15,14 @@ dependencies = [
     "numpy>=1.19",
     "keras>=2.4",
     "pillow>=9",
-    "torch>=2.4",
-    "torchvision>=0.19",
-    "cookit>=0.8.1",
+    "cookit[pydantic]>=0.8.1",
     "httpx>=0.27.2",
     "githubkit>=0.11.14",
     "yarl>=1.17.1",
     "tqdm>=4.66.6",
+    # model1
+    "onnxruntime>=1.19.2",
+    "onnxruntime-gpu>=1.19.2"
 ]
 license = { text = "MIT" }
 readme = "README.md"
@@ -32,7 +33,9 @@ homepage = "https://github.com/Refound-445/nonebot-plugin-nailongremove"
 repository = "https://github.com/Refound-445/nonebot-plugin-nailongremove"
 
 [project.optional-dependencies]
-model1 = ["onnxruntime>=1.19.2", "onnxruntime-gpu>=1.19.2"]
+model0 = ["torch>=2.4", "torchvision>=0.19"]
+model1 = []
+all = ["nonebot-plugin-nailongremove[model0,model1]"]
 
 [build-system]
 requires = ["pdm-backend"]
