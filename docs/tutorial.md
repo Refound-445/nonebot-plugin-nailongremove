@@ -176,7 +176,16 @@ nb sh
 
 如果想要使用默认的模型 1，为了避免一些问题，onnxruntime 没有包括在插件依赖里，不会随插件安装而自动安装，你需要自行安装
 
-#### CPU 运行
+> [!NOTE]
+> 从旧版本升级上来的用户务必卸载原先混装在一起的 onnxruntime 之后按照下面的内容操作一遍
+>
+> 卸载命令：
+>
+> ```shell
+> pip uninstall onnxruntime onnxruntime-gpu
+> ```
+
+#### 4.1.1. CPU 运行
 
 直接运行下面命令安装 `onnxruntime` 即可
 
@@ -184,7 +193,11 @@ nb sh
 pip install onnxruntime
 ```
 
-#### GPU 运行
+#### 4.1.2. GPU 运行
+
+> [!TIP]
+> 以下操作比较繁琐，非专业人士可以不考虑使用 CUDA  
+> 实际上对于本模型 CUDA 加速并不是很明显
 
 首先安装 `onnxruntime-gpu`
 
@@ -194,6 +207,8 @@ pip install onnxruntime-gpu
 
 检查你安装的 `onnxruntime-gpu` 版本，对照 [这里](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements) 检查你安装的版本需要的 CUDA 和 cuDNN 版本，如果没有安装则需要自行安装（教程待补充）
 
+接下来在 [这里](https://pytorch.org/get-started/locally/) 筛选对应信息后复制命令安装支持 CUDA 的 `pytorch` 库
+
 最后更改插件配置项，让 `onnxruntime` 使用 CUDA 运行（[NoneBot 配置简单介绍看这里](#71-修改插件配置项)）
 
 ```properties
@@ -202,9 +217,9 @@ NAILONG_ONNX_PROVIDERS=["CUDAExecutionProvider"]
 
 ### 4.2. 模型 0
 
-如果想要使用模型 0，按照下面的操作来安装额外依赖
+#### 4.2.1. CPU 运行
 
-再安装额外依赖
+按照下面的操作来安装额外依赖
 
 ```shell
 pip install "nonebot-plugin-nailongremove[model0]"
@@ -214,6 +229,10 @@ pip install "nonebot-plugin-nailongremove[model0]"
 
 ![4.2-1](./assets/4_2-1.png)  
 ![4.2-2](./assets/4_2-2.png)
+
+#### 4.2.2. GPU 运行
+
+参照 [4.1.2](#412-gpu-运行) 部分安装支持 CUDA 的 `pytorch` 库即可
 
 ## 5. 启动 NoneBot
 

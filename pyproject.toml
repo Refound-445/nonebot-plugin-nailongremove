@@ -32,6 +32,7 @@ repository = "https://github.com/Refound-445/nonebot-plugin-nailongremove"
 
 [project.optional-dependencies]
 model0 = ["torchvision>=0.19"]
+model1 = []
 all = ["model0"]
 
 [build-system]
