@@ -54,7 +54,7 @@ class Config(BaseModel):
     nailong_model: ModelType = ModelType.TARGET_DETECTION
     nailong_auto_update_model: bool = True
     nailong_concurrency: int = 1
-    nailong_onnx_try_to_use_gpu: bool = True
+    nailong_onnx_providers: List[str] = ["CPUExecutionProvider"]
 
     nailong_model1_type: Model1Type = Model1Type.TINY
     nailong_model1_yolox_size: Optional[Tuple[int, int]] = None
@@ -71,9 +71,7 @@ class Config(BaseModel):
         mode="before",
     )
     def transform_to_dict(cls, v: Any):  # noqa: N805
-        if not isinstance(v, dict):
-            return {DEFAULT_LABEL: v}
-        return v
+        return v if isinstance(v, dict) else {DEFAULT_LABEL: v}
 
     @field_validator(
         "nailong_tip",
@@ -84,6 +82,22 @@ class Config(BaseModel):
     def check_default_label_exists(cls, v: Dict[str, Any]):  # noqa: N805
         if DEFAULT_LABEL not in v:
             raise ValueError(f"Please ensure default label {DEFAULT_LABEL} in dict")
+        return v
+
+    @field_validator("nailong_onnx_provider_type", mode="before")
+    def transform_to_list(cls, v: Any):  # noqa: N805
+        return v if isinstance(v, list) else [v]
+
+    @field_validator("nailong_onnx_provider_type", mode="after")
+    def validate_provider_available(cls, v: Any):  # noqa: N805
+        try:
+            from onnxruntime.capi import _pybind_state as c
+        except ImportError:
+            pass
+        else:
+            available_providers: List[str] = c.get_available_providers()  # type: ignore
+            if any(p not in available_providers for p in v):
+                raise ValueError(f"Provider {v} not available in onnxruntime")
         return v
 
 

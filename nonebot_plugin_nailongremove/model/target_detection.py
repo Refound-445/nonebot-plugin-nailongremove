@@ -3,8 +3,11 @@ from dataclasses import dataclass
 from typing import Optional
 from typing_extensions import override
 
+# import torch before onnxruntime
+import torch as torch  # isort: skip
+import onnxruntime  # isort: skip
+
 import numpy as np
-import onnxruntime
 from cookit import with_semaphore
 from nonebot.utils import run_sync
 
@@ -44,15 +47,7 @@ labels = labels_path.read_text("u8").splitlines()
 
 session = onnxruntime.InferenceSession(
     model_path,
-    providers=(
-        [
-            "TensorrtExecutionProvider",
-            "CUDAExecutionProvider",
-            "CPUExecutionProvider",
-        ]
-        if config.nailong_onnx_try_to_use_gpu
-        else ["CPUExecutionProvider"]
-    ),
+    providers=config.nailong_onnx_providers,
 )
 input_shape = config.nailong_model1_yolox_size or config.nailong_model1_type.yolox_size
 
