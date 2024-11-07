@@ -62,7 +62,7 @@ NaiLongRemove 是一款由简单的 AI 模型建立的奶龙识别插件，可�
 
 ## 💿 安装
 
-**如果你从来没接触过 NoneBot，请查看 [这个文档](./docs/tutorial.md)**
+**如果你从来没接触过 NoneBot，请查看 [这个文档](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/docs/tutorial.md)**
 
 以下提到的方法 任选**其一** 即可
 
