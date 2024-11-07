@@ -84,11 +84,11 @@ class Config(BaseModel):
             raise ValueError(f"Please ensure default label {DEFAULT_LABEL} in dict")
         return v
 
-    @field_validator("nailong_onnx_provider_type", mode="before")
+    @field_validator("nailong_onnx_providers", mode="before")
     def transform_to_list(cls, v: Any):  # noqa: N805
         return v if isinstance(v, list) else [v]
 
-    @field_validator("nailong_onnx_provider_type", mode="after")
+    @field_validator("nailong_onnx_providers", mode="after")
     def validate_provider_available(cls, v: Any):  # noqa: N805
         try:
             from onnxruntime.capi import _pybind_state as c
