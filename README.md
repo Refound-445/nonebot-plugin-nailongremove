@@ -125,6 +125,8 @@ plugins = [
 
 </details>
 
+安装完成之后请参考 [这里](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/docs/tutorial.md#4-%E6%A8%A1%E5%9E%8B%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE) 完成模型配置相关操作
+
 ## ⚙️ 配置
 
 在 nonebot2 项目的 `.env` 文件中添加下表中的必填配置
