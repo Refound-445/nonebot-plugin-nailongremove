@@ -172,6 +172,11 @@ nb sh
 
 接下来介绍安装完插件后要使用对应模型所需要额外做的一些操作
 
+> [!NOTE]
+> 以下的每节内容中，请在 CPU 运行 和 GPU 运行 中 **只选择其中一节** 进行操作即可
+>
+> 如果你的机器没有英伟达（NVIDIA）显卡（GPU），或者你想避免麻烦的专业操作，请选择按照 CPU 运行 一节操作
+
 ### 4.1. 模型 1（默认）
 
 如果想要使用默认的模型 1，为了避免一些问题，onnxruntime 没有包括在插件依赖里，不会随插件安装而自动安装，你需要自行安装
@@ -195,10 +200,6 @@ pip install onnxruntime
 
 #### 4.1.2. GPU 运行
 
-> [!TIP]
-> 以下操作比较繁琐，非专业人士可以不考虑使用 CUDA  
-> 实际上对于本模型 CUDA 加速并不是很明显
-
 首先安装 `onnxruntime-gpu`
 
 ```shell
@@ -209,7 +210,7 @@ pip install onnxruntime-gpu
 
 接下来在 [这里](https://pytorch.org/get-started/locally/) 筛选对应信息后复制命令安装支持 CUDA 的 `pytorch` 库
 
-最后更改插件配置项，让 `onnxruntime` 使用 CUDA 运行（[NoneBot 配置简单介绍看这里](#71-修改插件配置项)）
+最后更改插件配置项，让 `onnxruntime` 使用 CUDA 运行（[NoneBot 配置简单介绍看这里](#72-修改插件配置项)）
 
 ```properties
 NAILONG_ONNX_PROVIDERS=["CUDAExecutionProvider"]
@@ -219,16 +220,11 @@ NAILONG_ONNX_PROVIDERS=["CUDAExecutionProvider"]
 
 #### 4.2.1. CPU 运行
 
-按照下面的操作来安装额外依赖
+执行下面的命令来安装额外依赖
 
 ```shell
 pip install "nonebot-plugin-nailongremove[model0]"
 ```
-
-安装过程如图
-
-![4.2-1](./assets/4_2-1.png)  
-![4.2-2](./assets/4_2-2.png)
 
 #### 4.2.2. GPU 运行
 
@@ -328,7 +324,11 @@ Linux 下也可以使用 `./#run.sh`
 
 ## 7. 后续
 
-### 7.1. 修改插件配置项
+### 7.1. 重新启动
+
+无需再做前面的部署操作，参考 [第 5 节](#5-启动-nonebot) 启动你的 NoneBot，之后直接启动你在 第 6 节 中配置好的协议端即可
+
+### 7.2. 修改插件配置项
 
 参考 [NoneBot 文档 DotEnv 配置 一节](https://nonebot.dev/docs/appendices/config#dotenv-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6) 的文件格式，修改 `.env.prod` 文件即可
 
@@ -338,7 +338,7 @@ Linux 下也可以使用 `./#run.sh`
 NAILONG_MODEL=1
 ```
 
-![7.1-1](./assets/7_1-1.png)
+![7.2-1](./assets/7_2-1.png)
 
 多行配置项例子：
 
@@ -357,9 +357,9 @@ NAILONG_TIP='
 '
 ```
 
-![7.1-2](./assets/7_1-2.png)
+![7.2-2](./assets/7_2-2.png)
 
-### 7.2. 更新插件
+### 7.3. 更新插件
 
 在 Bot 项目目录下打开命令行，之后执行下面命令即可
 
@@ -367,6 +367,8 @@ NAILONG_TIP='
 nb plugin update nonebot-plugin-nailongremove
 ```
 
-### 7.3. 常见问题
+### 7.4. 常见问题
 
-常见问题请跳转至 [issues](https://github.com/Refound-445/nonebot-plugin-nailongremove/issues?q=is%3Aissue+is%3Aclosed)
+待补充
+
+其他未列出的问题请尝试前往 [Issues](https://github.com/Refound-445/nonebot-plugin-nailongremove/issues?q=is%3Aissue) 寻找
