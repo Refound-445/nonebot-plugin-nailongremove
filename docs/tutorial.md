@@ -259,41 +259,53 @@ Linux 下也可以使用 `./#run.sh`
 
 ### 6.1. Lagrange.OneBot
 
-下载安装步骤参见 [NoneBotX 社区文档](https://x.none.bot/before/install_lagrange)
+第三方的 NTQQ 协议实现
 
-注：首次启动生成配置文件（`appsettings.json`）后建议先在配置文件中把 Bot 的 QQ 号先填好，参考下面配置，把其中的 `0` 替换为你 Bot 的 QQ 号，密码不填使用扫码登录
+打开 Lagrange 存储库的 Actions 页，筛选 Lagrange.OneBot Build 的 Workflow，然后筛选 master 分支（[可以点这里](https://github.com/LagrangeDev/Lagrange.Core/actions/workflows/Lagrange.OneBot-build.yml?query=branch%3Amaster)）
 
-```jsonc
-{
-  // ...
-  "Account": {
-    "Uin": 0,
-    "Password": ""
-    // ...
-  }
-  // ...
-}
-```
+（这里是手动打开的步骤，从上面链接点进去的可以不用看）  
+![6.1-1](./assets/6_1-1.png)
 
-安装好后修改其配置文件使其以反向 Websocket 连接到 NoneBot 即可，参考下面配置，记得把下面 `Port` 后的 `8080` 修改成你之前配置的端口号
+之后找到对应你机器系统架构的构建产物下载  
+如果下面的文件列表无法点击下载，请登录 GitHub 账号
 
-```jsonc
-{
-  // ...
-  "Implementations": [
-    {
-      "Type": "ReverseWebSocket",
-      "Host": "127.0.0.1",
-      "Port": 8080,
-      "Suffix": "/onebot/v11/ws",
-      "ReconnectInterval": 5000,
-      "HeartBeatInterval": 5000,
-      "HeartBeatEnable": true,
-      "AccessToken": ""
-    }
-  ]
-}
-```
+<p>
+<details>
+
+<summary>判断你机器架构的方法（摘自 <a href="https://x.none.bot/before/install_lagrange">NoneBotX 社区文档</a>）（点击展开）</summary>
+
+- 如果你要在一般的个人电脑或者装有 Windows Server 的服务器上运行，请优先尝试 `win-x64` 版本；
+- 如果你要在装有 Linux 发行版的个人电脑/服务器上运行，请优先尝试 `linux-x64` 版本；
+- 如果你要在“树莓派”或智能手机等 ARM 设备上运行，请优先尝试 `linux-arm64` 版本，若无法运行则再尝试 `linux-arm` 版本；
+- 如果你要在 Apple M 系列芯片的电脑上运行，请选择 `osx-arm64` 版本，否则请选择 `osx-amd64` 版本。
+
+</details>
+</p>
+
+例：Windows、X86 架构 CPU、64 位系统（一般的家用电脑和 Windows 云服务器都是这样的）下载这个：  
+![6.1-2](./assets/6_1-2.png)
+
+下载完成后打开压缩包，找一个你喜欢的目录将里面的可执行文件解压出来，之后双击运行，看到下图样的提示后先直接把它关掉
+
+![6.1-3](./assets/6_1-3.png)
+
+打开同目录下 Lagrange 生成的 `appsettings.json`
+
+把 `Uin` 后的 `0` 替换为你 Bot 的 QQ 号，密码不动留空使用扫码登录，如下图
+
+![6.1-4](./assets/6_1-4.png)
+
+接着修改，让它能以反向 Websocket 连接到 NoneBot，参考下图，记得把下面 `Port` 后的 `8080` 修改成你之前配置的端口号
+
+![6.1-5](./assets/6_1-5.png)
+
+之后再次运行 Lagrange，手机登录 Bot 的 QQ 扫码登录
+
+![6.1-6](./assets/6_1-6.png)
+
+之后你应该可以看到你的 NoneBot 提示已经连接到 Bot 并可以正常接受消息了
+
+![6.1-7](./assets/6_1-7.png)
 
 ### 6.2. NapCat
 
