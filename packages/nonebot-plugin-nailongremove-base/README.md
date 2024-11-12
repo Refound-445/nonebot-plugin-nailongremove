@@ -1,4 +1,4 @@
-<!-- markdownlint-disable MD031 MD033 MD036 MD041 -->
+<!-- markdownlint-disable MD028 MD031 MD033 MD036 MD041 -->
 
 <div align="center">
 
@@ -64,6 +64,10 @@ NaiLongRemove 是一款由简单的 AI 模型建立的奶龙识别插件，可�
 
 **如果你从来没接触过 NoneBot，请查看 [这个文档](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/docs/tutorial.md)**
 
+为避免依赖问题，我们把使用 GPU 推理的插件安装方式与普通安装分开了，供有需要的用户选择安装
+
+### 使用 CPU 推理
+
 以下提到的方法 任选**其一** 即可
 
 <details open>
@@ -125,7 +129,59 @@ plugins = [
 
 </details>
 
-安装完成之后请参考 [这里](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/docs/tutorial.md#4-%E6%A8%A1%E5%9E%8B%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE) 完成模型配置相关操作
+### 使用 GPU 推理
+
+<details>
+<summary>点击展开</summary>
+
+> [!NOTE]
+> 以下操作比较专业及繁琐，非专业用户可以不考虑使用  
+> 实际上对于本插件使用的模型使用 CUDA 加速效果不大，不要什么都不懂就犟着要来搞这些
+
+先进入 Bot 虚拟环境（如果有）
+
+> [!NOTE]
+> 如果你以前安装了使用 CPU 推理的包，请先卸载
+>
+> ```bash
+> pip uninstall nonebot-plugin-nailongremove torch torchvision onnxruntime
+> ```
+
+安装底包
+
+```bash
+pip install nonebot-plugin-nailongremove-base
+```
+
+根据你安装的 CUDA 与 CuDNN 版本（如果有装，没有就去装），按照官网说明安装对应版本的以下依赖：
+
+- `torch`（[官网说明](https://pytorch.org/get-started/locally/#start-locally)）
+- `onnxruntime-gpu`（[官网说明](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements)）
+
+安装完后配置插件使用 CUDA 进行推理
+
+```properties
+NAILONG_ONNX_PROVIDERS=["CUDAExecutionProvider"]
+```
+
+最后配置让 nonebot2 加载插件  
+打开 nonebot2 项目根目录下的 `pyproject.toml` 文件, 在 `[tool.nonebot]` 部分的 `plugins` 项里追加写入
+
+```toml
+[tool.nonebot]
+plugins = [
+    # ...
+    "nonebot_plugin_nailongremove"
+]
+```
+
+之后更新插件的话，进入虚拟环境只更新底包即可，不要安装及更新不带 base 的包
+
+```bash
+pip install nonebot-plugin-nailongremove-base -U
+```
+
+</details>
 
 ## ⚙️ 配置
 
