@@ -8,12 +8,8 @@ readme = "README.md"
 
 [tool.pdm.dev-dependencies]
 dev = [
-    "httpx>=0.27.2",
-    "beautifulsoup4>=4.12.3",
-    "lxml>=5.3.0",
     "-e file:///${PROJECT_ROOT}/packages/nonebot-plugin-nailongremove-base#egg=nonebot-plugin-nailongremove-base",
     "-e file:///${PROJECT_ROOT}/packages/nonebot-plugin-nailongremove#egg=nonebot-plugin-nailongremove",
-    # "-e file:///${PROJECT_ROOT}/packages/nonebot-plugin-nailongremove-gpu#egg=nonebot-plugin-nailongremove-gpu",
 ]
 
 [build-system]
