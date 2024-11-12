@@ -33,3 +33,5 @@ install-cpu = { composite = ["install-base", "install-cpu"] }
 install-gpu = { composite = ["install-base", "install-gpu"] }
 
 lock-base = { shell = "cd packages/nonebot-plugin-nailongremove-base && pdm lock && cd ../.." }
+
+pub-all = { call = "scripts.pub_all:main" }

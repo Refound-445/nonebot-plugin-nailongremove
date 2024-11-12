@@ -7,8 +7,8 @@ import httpx
 import tomllib
 from packaging.version import Version
 
-ROOT_PATH = Path(__file__).parent.parent
-PACKAGES_PATH = ROOT_PATH / "packages"
+from .utils import PACKAGES_PATH
+
 SUFFIX = ".template.toml"
 TORCH_BASE = "https://download.pytorch.org"
 TORCH_INDEX = f"{TORCH_BASE}/whl/cu124"
