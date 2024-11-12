@@ -98,14 +98,15 @@ def get_torch_deps() -> str:
     return "\n    ".join(f'"{x}",' for x in deps).strip(",")
 
 
-TORCH = get_torch_deps()
+# TORCH = get_torch_deps()
 
 
 def process(file_path: Path):
     file_path.with_name(file_path.name.replace(".template", "")).write_text(
-        file_path.read_text(encoding="u8")
-        .replace("%%version%%", VERSION)
-        .replace('"%%torch%%"', TORCH),
+        (
+            file_path.read_text(encoding="u8").replace("%%version%%", VERSION)
+            # .replace('"%%torch%%"', TORCH)
+        ),
         "u8",
     )
 

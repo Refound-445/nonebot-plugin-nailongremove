@@ -11,8 +11,8 @@ dev = [
     "httpx>=0.27.2",
     "beautifulsoup4>=4.12.3",
     "lxml>=5.3.0",
-    # "-e file:///${PROJECT_ROOT}/packages/nonebot-plugin-nailongremove-base#egg=nonebot-plugin-nailongremove-base",
-    # "-e file:///${PROJECT_ROOT}/packages/nonebot-plugin-nailongremove-cpu#egg=nonebot-plugin-nailongremove",
+    "-e file:///${PROJECT_ROOT}/packages/nonebot-plugin-nailongremove-base#egg=nonebot-plugin-nailongremove-base",
+    "-e file:///${PROJECT_ROOT}/packages/nonebot-plugin-nailongremove#egg=nonebot-plugin-nailongremove",
     # "-e file:///${PROJECT_ROOT}/packages/nonebot-plugin-nailongremove-gpu#egg=nonebot-plugin-nailongremove-gpu",
 ]
 
@@ -25,13 +25,4 @@ distribution = false
 
 [tool.pdm.scripts]
 render = { call = "scripts.render:main" }
-
-install-base = { shell = "cd packages/nonebot-plugin-nailongremove-base && pdm install && cd ../.." }
-install-cpu-s = { shell = "cd packages/nonebot-plugin-nailongremove-cpu && pdm install && cd ../.." }
-install-gpu-s = { shell = "cd packages/nonebot-plugin-nailongremove-gpu && pdm install && cd ../.." }
-install-cpu = { composite = ["install-base", "install-cpu"] }
-install-gpu = { composite = ["install-base", "install-gpu"] }
-
-lock-base = { shell = "cd packages/nonebot-plugin-nailongremove-base && pdm lock && cd ../.." }
-
 pub-all = { call = "scripts.pub_all:main" }
