@@ -28,4 +28,4 @@ jobs:
           pdm venv create --with-pip
           eval "$(pdm venv activate)"
           pdm pre-install
-          pdm pub-all
+          pdm pub-all-pub

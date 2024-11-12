@@ -23,4 +23,5 @@ distribution = false
 install-scripts = { shell = "cd scripts && pdm install -G:all && cd .." }
 render = { call = "scripts.src.render:main" }
 pre-install = { composite = ["install-scripts", "render"] }
-pub-all = { call = "scripts.src.pub_all:main" }
+pub-all-pub = { call = "scripts.src.pub_all:main" }
+pub-all = { composite = ["render", "pub-all-pub"] }
