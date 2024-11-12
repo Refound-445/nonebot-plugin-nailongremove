@@ -14,7 +14,7 @@ dependencies = [
     "onnxruntime>=1.19.2",
 ]
 license = { text = "MIT" }
-readme = "README.md"
+readme = "../nonebot-plugin-nailongremove-base/README.md"
 keywords = ["nonebot", "plugin", "image"]
 
 [project.urls]
