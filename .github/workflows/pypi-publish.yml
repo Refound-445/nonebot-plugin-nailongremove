@@ -25,7 +25,7 @@ jobs:
 
       - name: Build and Publish distribution 📦 to PyPI
         run: |-
-          # pdm install --prod
+          pdm install -dG scripts
+          eval "$(pdm venv activate)"
           pdm render
-          pdm install -G:all
           pdm pub-all
