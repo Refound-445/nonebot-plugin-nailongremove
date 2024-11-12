@@ -2,7 +2,7 @@ from pathlib import Path
 from subprocess import run
 from typing import Any
 
-ROOT_PATH = Path(__file__).parent.parent
+ROOT_PATH = Path(__file__).parent.parent.parent
 PACKAGES_PATH = ROOT_PATH / "packages"
 
 
