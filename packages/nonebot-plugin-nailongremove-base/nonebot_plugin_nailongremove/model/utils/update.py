@@ -56,10 +56,10 @@ def create_parent_dir(path: Path, create: bool = True):
 
 
 def find_file(
-    path: Path,
-    checker: Union[Callable[[Path], bool], str, None] = None,
-    recursive: bool = False,
-    last_modified: bool = True,
+        path: Path,
+        checker: Union[Callable[[Path], bool], str, None] = None,
+        recursive: bool = False,
+        last_modified: bool = True,
 ) -> Optional[Path]:
     if isinstance(checker, str) and checker:
         if (p := path / checker).exists():
@@ -99,10 +99,12 @@ class ModelInfo(Generic[T]):
 
 class ModelUpdater(ABC):
     @abstractmethod
-    def find_from_local(self) -> Optional[Path]: ...
+    def find_from_local(self) -> Optional[Path]:
+        ...
 
     @abstractmethod
-    def get_info(self) -> ModelInfo: ...
+    def get_info(self) -> ModelInfo:
+        ...
 
     @property
     def root_dir(self) -> Path:
@@ -119,8 +121,8 @@ class ModelUpdater(ABC):
 
     def check_local_ver(self, info: ModelInfo) -> Optional[str]:
         if (
-            self.get_path(info.filename).exists()
-            and (ver_path := self.get_ver_path(info.filename)).exists()
+                self.get_path(info.filename).exists()
+                and (ver_path := self.get_ver_path(info.filename)).exists()
         ):
             return ver_path.read_text(encoding="u8").strip()
         return None
@@ -162,10 +164,10 @@ class ModelUpdater(ABC):
         return
 
     def validate_with_unlink(
-        self,
-        path: Path,
-        info: ModelInfo,
-        clear_ver: bool = True,
+            self,
+            path: Path,
+            info: ModelInfo,
+            clear_ver: bool = True,
     ) -> Any:
         try:
             return self.validate(path, info)
@@ -177,9 +179,9 @@ class ModelUpdater(ABC):
 
     def _get(self, force_update: bool = False) -> Path:
         if (
-            (not force_update)
-            and (not config.nailong_auto_update_model)
-            and (local := self.find_from_local())
+                (not force_update)
+                and (not config.nailong_auto_update_model)
+                and (local := self.find_from_local())
         ):
             logger.info("Update skipped")
             return local
@@ -299,10 +301,10 @@ class GitHubRepoModelUpdater(GitHubModelUpdater):
 
 class GitHubLatestReleaseModelUpdater(GitHubModelUpdater):
     def __init__(
-        self,
-        owner: str,
-        repo: str,
-        local_filename_checker: Optional[Callable[[str], bool]] = None,
+            self,
+            owner: str,
+            repo: str,
+            local_filename_checker: Optional[Callable[[str], bool]] = None,
     ) -> None:
         super().__init__()
         self.owner = owner

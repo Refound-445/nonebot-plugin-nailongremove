@@ -9,8 +9,9 @@ from torchvision import transforms
 
 from ..config import DEFAULT_LABEL
 from ..frame_source import FrameSource
-from .utils.common import CheckResult, CheckSingleResult, race_check
+from .utils.common import CheckResult, CheckSingleResult, race_check, similarity_process
 from .utils.update import GitHubRepoModelUpdater
+from ..config import config
 
 model_path = GitHubRepoModelUpdater(
     "spawner1145",
@@ -35,17 +36,23 @@ SIZE = 224
 
 
 @run_sync
-def check_single(image: np.ndarray) -> CheckSingleResult[None]:
-    if image.shape[0] < SIZE or image.shape[1] < SIZE:
+def check_single(image: np.ndarray, is_gif: bool = False) -> CheckSingleResult[None]:
+    if is_gif:
+        res = similarity_process(image, dsize=(SIZE, SIZE))
+        if res is not None:
+            return res
         return CheckSingleResult.not_ok(None)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    image = cv2.resize(image, (SIZE, SIZE))
-    image = transform(image)
-    image = image.unsqueeze(0)  # type: ignore
-    with torch.no_grad():
-        output = model(image.to(device))  # type: ignore
-        _, pred = torch.max(output, 1)
-        return CheckSingleResult(ok=pred.item() == 1, label=DEFAULT_LABEL, extra=None)
+    else:
+        if image.shape[0] < SIZE or image.shape[1] < SIZE:
+            return CheckSingleResult.not_ok(None)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = cv2.resize(image, (SIZE, SIZE))
+        image = transform(image)
+        image = image.unsqueeze(0)  # type: ignore
+        with torch.no_grad():
+            output = model(image.to(device))  # type: ignore
+            _, pred = torch.max(output, 1)
+            return CheckSingleResult(ok=pred.item() == 1, label=DEFAULT_LABEL, extra=None)
 
 
 async def check(source: FrameSource):

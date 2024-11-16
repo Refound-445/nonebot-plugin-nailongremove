@@ -92,7 +92,7 @@ _COLORS = (
         ],
     )
     .astype(np.float32)
-    .reshape(-1, 3) 
+    .reshape(-1, 3)
 )  # fmt: skip
 
 
