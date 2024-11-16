@@ -14,10 +14,15 @@ jobs:
           fetch-depth: 1
           submodules: true
 
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: 3.12
+          enable-pep582: true
+
       - name: Install project dependencies
         run: |-
           pdm config python.use_venv false
-          pdm --pep582
           pdm pre-install
           pdm install -G:all
 
