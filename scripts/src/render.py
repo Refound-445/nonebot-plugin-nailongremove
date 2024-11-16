@@ -2,7 +2,10 @@ import re
 from pathlib import Path
 from typing import TypedDict
 
-import tomllib
+try:
+    import tomllib  # pyright: ignore[reportMissingImports]
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 from .utils import PACKAGES_PATH
 

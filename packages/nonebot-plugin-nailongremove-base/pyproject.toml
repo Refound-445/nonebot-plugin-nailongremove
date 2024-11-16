@@ -19,8 +19,8 @@ dependencies = [
     "githubkit>=0.11.14",
     "yarl>=1.17.1",
     "tqdm>=4.66.6",
-    "huggingface-hub>=0.26",
-    "ultralytics>=8.3",
+    "huggingface-hub>=0.26.2",
+    "ultralytics>=8.3.31",
     "gradio-client>=1.3.0",
 ]
 license = { text = "MIT" }
@@ -30,8 +30,6 @@ keywords = ["nonebot", "plugin", "image"]
 [project.urls]
 homepage = "https://github.com/Refound-445/nonebot-plugin-nailongremove"
 repository = "https://github.com/Refound-445/nonebot-plugin-nailongremove"
-
-[project.optional-dependencies]
 
 [build-system]
 requires = ["pdm-backend"]

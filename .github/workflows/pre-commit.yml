@@ -1,0 +1,24 @@
+name: Pre Commit Check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          submodules: true
+
+      - name: Install project dependencies
+        run: |-
+          pdm config python.use_venv false
+          pdm --pep582
+          pdm pre-install
+          pdm install -G:all
+
+      - uses: pre-commit/action@v3.0.1

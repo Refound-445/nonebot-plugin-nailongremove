@@ -8,6 +8,13 @@ readme = "README.md"
 
 [tool.pdm.dev-dependencies]
 dev = [
+    # pip
+    "setuptools>=73.0.1",
+    "pip>=24.2",
+    # tools
+    "basedpyright>=1.17.0",
+    "ruff>=0.6.2",
+    # packages
     "-e file:///${PROJECT_ROOT}/packages/nonebot-plugin-nailongremove-base#egg=nonebot-plugin-nailongremove-base",
     "-e file:///${PROJECT_ROOT}/packages/nonebot-plugin-nailongremove#egg=nonebot-plugin-nailongremove",
 ]
@@ -25,3 +32,88 @@ render = { call = "scripts.src.render:main" }
 pre-install = { composite = ["install-scripts", "render"] }
 pub-all-pub = { call = "scripts.src.pub_all:main" }
 pub-all = { composite = ["render", "pub-all-pub"] }
+
+[tool.basedpyright]
+pythonVersion = "3.9"
+defineConstant = { PYDANTIC_V2 = true }
+typeCheckingMode = "standard"
+reportShadowedImports = false
+exclude = ["__pypackages__"]
+
+[tool.ruff]
+target-version = "py39"
+
+[tool.ruff.format]
+docstring-code-format = true
+line-ending = "lf"
+
+[tool.ruff.lint]
+preview = true
+ignore = [
+    "B008",
+    "B905",
+    # "COM812",
+    "E501",
+    "F821",    # conflict with pyright
+    "FBT001",
+    "FBT002",
+    "ISC001",
+    "PERF203",
+    "PGH003",
+    "PLC04",
+    "RUF001",
+    "RUF002",
+    "RUF003",
+    "RUF006",
+    "RUF029",
+    "RUF100",
+    "S101",
+    "S311",
+    "S404",
+    "SIM117",
+    "TRY002",
+    "TRY003",
+]
+select = [
+    "A",
+    "ANN001",
+    "ARG",
+    "ASYNC",
+    "B",
+    "C4",
+    "COM",
+    "DTZ",
+    "E",
+    "F",
+    "FBT",
+    "FLY",
+    "FURB",
+    "I",
+    "ISC",
+    "N",
+    "NPY",
+    "PERF",
+    "PIE",
+    "PGH",
+    # "PL",
+    "PT",
+    "PTH",
+    "PYI",
+    "Q",
+    "RET",
+    "RSE",
+    "RUF",
+    "S",
+    "SIM",
+    "SLF",
+    "SLOT",
+    "TCH",
+    "TRY",
+    "YTT",
+]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+detect-same-package = true
+extra-standard-library = ["typing_extensions"]
+split-on-trailing-comma = true
