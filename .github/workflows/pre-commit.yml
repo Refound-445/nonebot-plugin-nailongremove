@@ -5,6 +5,8 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions: write-all
+
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
@@ -26,8 +28,8 @@ jobs:
 
       - name: Run pre-commit
         run: |-
-          pdm run pre-commit run --all-files --show-diff-on-failure --color=always
-          local ret=$?
+          local ret=0
+          pdm run pre-commit run --all-files --show-diff-on-failure --color=always || ret=$?
 
           # push back changes
           if [[ -n "$(git status -s)" ]]; then
