@@ -228,9 +228,9 @@ pip install nonebot-plugin-nailongremove-base -U
 
 ### 可用模型
 
-- `0`：基于 Renet50 图像分类模型训练推理，感谢 @spawner1145 提供的模型，原链接：[spawner1145/NailongRecognize](https://github.com/spawner1145/NailongRecognize.git)
-- `1`：基于 YOLOX 目标检测模型训练推理，感谢 @NKXingXh 提供的模型，原链接：[nkxingxh/NailongDetection](https://github.com/nkxingxh/NailongDetection)
-- `2`：基于 YOLOv11 目标检测模型训练推理，感谢 @Hakureirm 提供的模型，原链接：[Hakureirm/NailongKiller](https://huggingface.co/spaces/Hakureirm/NailongKiller)
+- `0`：基于 Renet50 图像分类模型训练推理，感谢 [@spawner1145](https://github.com/spawner1145) 提供的模型，原链接：[spawner1145/NailongRecognize](https://github.com/spawner1145/NailongRecognize.git)
+- `1`：基于 YOLOX 目标检测模型训练推理，感谢 [@NKXingXh](https://github.com/nkxingxh) 提供的模型，原链接：[nkxingxh/NailongDetection](https://github.com/nkxingxh/NailongDetection)
+- `2`：基于 YOLOv11 目标检测模型训练推理，感谢 [@Hakureirm](https://github.com/Hakureirm) 提供的模型，原链接：[Hakureirm/NailongKiller](https://huggingface.co/Hakureirm/NailongKiller)
 
 ### 消息模板可用变量
 
@@ -247,7 +247,7 @@ pip install nonebot-plugin-nailongremove-base -U
 
 只要有人发奶龙表情包被识别出来，就会被撤回并提醒。
 
-本地存储报错图片（`SUPERUSERS`）；发送"这是[种类]"+图片，例如："这是nailong+图片"，便会自动存储到本地，开启相似度检测后，在下一次检测图片会优先识别本地已存储的图片。
+本地存储报错图片（限`SUPERUSERS`）：发送"这是[种类]"+图片，例如："这是nailong+图片"，便会自动存储到本地，开启相似度检测后，在下一次检测图片会优先识别本地已存储的图片。
 
 ## 📞 联系
 
