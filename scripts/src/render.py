@@ -5,7 +5,7 @@ from typing import TypedDict
 try:
     import tomllib  # pyright: ignore[reportMissingImports]
 except ModuleNotFoundError:
-    import tomli as tomllib
+    import tomli as tomllib  # pyright: ignore[reportMissingImports]
 
 from .utils import PACKAGES_PATH
 
