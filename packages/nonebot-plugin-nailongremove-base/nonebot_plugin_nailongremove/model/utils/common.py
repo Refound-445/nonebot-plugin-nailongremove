@@ -20,7 +20,7 @@ from ...frame_source import FrameSource
 
 T = TypeVar("T")
 
-device = torch.device("cuda" if config.nailong_onnx_try_to_use_gpu and torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 @dataclass
