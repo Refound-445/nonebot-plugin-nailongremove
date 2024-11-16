@@ -17,13 +17,27 @@ jobs:
       - name: Setup PDM
         uses: pdm-project/setup-pdm@v4
         with:
-          python-version: 3.12
           enable-pep582: true
 
       - name: Install project dependencies
         run: |-
-          pdm config python.use_venv false
           pdm pre-install
           pdm install -G:all
 
-      - uses: pre-commit/action@v3.0.1
+      - name: Run pre-commit
+        run: |-
+          pdm run pre-commit run --all-files --show-diff-on-failure --color=always
+          local ret=$?
+
+          # push back changes
+          if [[ -n "$(git status -s)" ]]; then
+            git add .
+            git config user.name github-actions[bot]
+            git config user.email github-actions[bot]@users.noreply.github.com
+            git commit -m "chore: pre-commit auto fix [skip ci]"
+            git push
+          else
+            echo "No changes detected."
+          fi
+
+          exit $ret

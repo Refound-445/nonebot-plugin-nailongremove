@@ -6,6 +6,9 @@ dependencies = []
 license = { text = "MIT" }
 readme = "README.md"
 
+[tool.pdm]
+distribution = false
+
 [tool.pdm.dev-dependencies]
 dev = [
     # pip
@@ -14,17 +17,11 @@ dev = [
     # tools
     "basedpyright>=1.17.0",
     "ruff>=0.6.2",
+    "pre-commit>=4.0.1",
     # packages
     "-e file:///${PROJECT_ROOT}/packages/nonebot-plugin-nailongremove-base#egg=nonebot-plugin-nailongremove-base",
     "-e file:///${PROJECT_ROOT}/packages/nonebot-plugin-nailongremove#egg=nonebot-plugin-nailongremove",
 ]
-
-[build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
-
-[tool.pdm]
-distribution = false
 
 [tool.pdm.scripts]
 install-scripts = { shell = "cd scripts && pdm install -G:all && cd .." }
@@ -32,6 +29,10 @@ render = { call = "scripts.src.render:main" }
 pre-install = { composite = ["install-scripts", "render"] }
 pub-all-pub = { call = "scripts.src.pub_all:main" }
 pub-all = { composite = ["render", "pub-all-pub"] }
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
 
 [tool.basedpyright]
 pythonVersion = "3.9"
