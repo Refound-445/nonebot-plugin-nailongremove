@@ -22,11 +22,20 @@ if config.nailong_model is ModelType.CLASSIFICATION:
         raise_extra_import_error(e, "model0")
 
 elif config.nailong_model is ModelType.TARGET_DETECTION:
-    pass
+    try:
+        from .target_detection import check as check
+    except ImportError as e:
+        raise ImportError(
+            "To avoid dependency issues, please install onnxruntime manually.\n"
+            "If you have a compatible GPU, "
+            "please run `pip install onnxruntime-gpu` in your project's environment, "
+            "then edit plugin's `NAILONG_ONNX_PROVIDERS` config to use it;\n"
+            "Otherwise run `pip install onnxruntime` in your project's environment "
+            "and use CPU to compute.",
+        ) from e
 
 elif config.nailong_model is ModelType.HF_DETECTION:
     from .hf_detection import check as check
 
-
 else:
-    raise ValueError("Invalid model type")
+    raise NotImplementedError  # never reach here

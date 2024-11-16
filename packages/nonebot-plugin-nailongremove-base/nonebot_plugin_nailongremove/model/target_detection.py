@@ -4,17 +4,17 @@ from typing import Optional
 from typing_extensions import override
 
 import numpy as np
-import onnxruntime
+# import torch before onnxruntime
+import torch as torch  # isort: skip
+import onnxruntime  # isort: skip
 from cookit import with_semaphore
 from nonebot.utils import run_sync
 
-from plugins.nonebot_plugin_nailongremove.config import config
-from plugins.nonebot_plugin_nailongremove.frame_source import FrameSource, repack_save
-from plugins.nonebot_plugin_nailongremove.model.utils.common import CheckResult, CheckSingleResult, race_check, \
-    similarity_process
-from plugins.nonebot_plugin_nailongremove.model.utils.update import GitHubLatestReleaseModelUpdater, ModelInfo, \
-    UpdaterGroup
-from plugins.nonebot_plugin_nailongremove.model.utils.yolox import demo_postprocess, multiclass_nms, preprocess, vis
+from ..config import config
+from ..frame_source import FrameSource, repack_save
+from .utils.common import CheckResult, CheckSingleResult, race_check, similarity_process
+from .utils.update import GitHubLatestReleaseModelUpdater, ModelInfo, UpdaterGroup
+from .utils.yolox import demo_postprocess, multiclass_nms, preprocess, vis
 import itertools
 
 model_filename_sfx = f"_{config.nailong_model1_type.value}.onnx"
@@ -47,15 +47,7 @@ labels = labels_path.read_text("u8").splitlines()
 
 session = onnxruntime.InferenceSession(
     model_path,
-    providers=(
-        [
-            "TensorrtExecutionProvider",
-            "CUDAExecutionProvider",
-            "CPUExecutionProvider",
-        ]
-        if config.nailong_onnx_try_to_use_gpu
-        else ["CPUExecutionProvider"]
-    ),
+    providers=config.nailong_onnx_providers,
 )
 input_shape = config.nailong_model1_yolox_size or config.nailong_model1_type.yolox_size
 

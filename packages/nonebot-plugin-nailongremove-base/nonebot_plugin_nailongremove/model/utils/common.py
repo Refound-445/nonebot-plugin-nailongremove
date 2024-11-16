@@ -115,7 +115,6 @@ async def race_check(
             return res
     return None
 
-
 def similarity_process(image1: np.ndarray, dsize) -> Optional[CheckSingleResult]:
     path = list(glob.glob(os.path.join(config.nailong_model_dir, 'records/*/*.jpg')))
     if len(path) == 0:
@@ -187,7 +186,7 @@ def process_gif_and_save_jpgs(frames, label, dsize, similarity_threshold=0.85):
             indices = torch.nonzero(similarities > similarity_threshold)
             index = indices.squeeze().tolist() if indices.numel() > 0 else None
             if type(index) is int:
-                index = [index]
+                index=[index]
             if index is not None:
                 indexs.extend([frame2_num[i] for i in index])
         frame_count = [i for i in frame_count if i not in indexs]

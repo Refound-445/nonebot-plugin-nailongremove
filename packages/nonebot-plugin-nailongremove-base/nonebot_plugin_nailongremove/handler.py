@@ -13,6 +13,7 @@ from .model import check
 from .uniapi import mute, recall
 from .model.utils.common import process_gif_and_save_jpgs
 
+
 T = TypeVar("T")
 
 
@@ -82,7 +83,6 @@ async def nailong_rule(
 
 nailong = on_message(rule=Rule(nailong_rule), priority=config.nailong_priority)
 input_shape = config.nailong_model1_yolox_size or config.nailong_model1_type.yolox_size
-
 
 @nailong.handle()
 async def handle_function(bot: BaseBot, ev: BaseEvent, msg: UniMsg, session: Uninfo):
