@@ -1034,14 +1034,14 @@ files = [
 
 [[package]]
 name = "nonebot-plugin-nailongremove"
-version = "2.3.2.post1"
+version = "2.3.2.post2"
 requires_python = "<4.0,>=3.9"
 editable = true
 path = "./packages/nonebot-plugin-nailongremove"
 summary = "识别目标并撤回图片插件"
 groups = ["dev"]
 dependencies = [
-    "nonebot-plugin-nailongremove-base==2.3.2.post1",
+    "nonebot-plugin-nailongremove-base==2.3.2.post2",
     "onnxruntime>=1.19.2",
     "torch>=2.4",
     "torchvision>=0.19",
@@ -1049,7 +1049,7 @@ dependencies = [
 
 [[package]]
 name = "nonebot-plugin-nailongremove-base"
-version = "2.3.2.post1"
+version = "2.3.2.post2"
 requires_python = "<4.0,>=3.9"
 editable = true
 path = "./packages/nonebot-plugin-nailongremove-base"
