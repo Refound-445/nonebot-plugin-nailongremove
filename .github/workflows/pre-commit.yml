@@ -43,4 +43,4 @@ jobs:
             echo "No changes detected."
           fi
 
-          exit $ret
+          exit $RET
