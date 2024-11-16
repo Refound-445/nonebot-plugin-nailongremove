@@ -62,7 +62,7 @@ class Config(BaseModel):
     nailong_model1_score: Dict[str, Optional[float]] = {
         DEFAULT_LABEL: 0.5,
     }
-    nailong_model2_online: bool=False
+    nailong_model2_online: bool = False
     nailong_check_mode: int = 0
     nailong_similarity_on: bool = False
     nailong_similarity_max_storage: int = 10
@@ -105,5 +105,6 @@ class Config(BaseModel):
             if any(p not in available_providers for p in v):
                 raise ValueError(f"Provider {v} not available in onnxruntime")
         return v
+
 
 config = get_plugin_config(Config)

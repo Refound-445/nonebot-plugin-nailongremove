@@ -1,18 +1,18 @@
 import re
 from typing import Any, Awaitable, Callable, Iterable, List, TypeVar
+
 from nonebot import logger, on_message
 from nonebot.adapters import Bot as BaseBot, Event as BaseEvent
 from nonebot.permission import SUPERUSER
 from nonebot.rule import Rule
-from nonebot_plugin_alconna.uniseg import UniMessage, UniMsg, Text
+from nonebot_plugin_alconna.uniseg import Text, UniMessage, UniMsg
 from nonebot_plugin_uninfo import QryItrface, Uninfo
 
 from .config import DEFAULT_LABEL, config
 from .frame_source import iter_sources_in_message, source_extractors
 from .model import check
-from .uniapi import mute, recall
 from .model.utils.common import process_gif_and_save_jpgs
-
+from .uniapi import mute, recall
 
 T = TypeVar("T")
 
@@ -22,7 +22,7 @@ def judge_list(lst: Iterable[T], val: T, blacklist: bool) -> bool:
 
 
 async def execute_functions_any_ok(
-        func: Iterable[Callable[[], Awaitable[Any]]],
+    func: Iterable[Callable[[], Awaitable[Any]]],
 ) -> bool:
     ok = False
     for f in func:
@@ -37,36 +37,36 @@ async def execute_functions_any_ok(
 
 
 async def nailong_rule(
-        bot: BaseBot,
-        event: BaseEvent,
-        session: Uninfo,
-        ss_interface: QryItrface,
-        msg: UniMsg,
+    bot: BaseBot,
+    event: BaseEvent,
+    session: Uninfo,
+    ss_interface: QryItrface,
+    msg: UniMsg,
 ) -> bool:
     return (
         # check if it's a group chat
-            bool(session.member)  # this prop only exists in group chats
-            # user blacklist
-            and (session.user.id not in config.nailong_user_blacklist)
-            # scene blacklist or whitelist
-            and judge_list(
-        config.nailong_list_scenes,
-        session.scene_path,
-        config.nailong_blacklist,
-    )
-            # bypass superuser
-            and ((not config.nailong_bypass_superuser) or (not await SUPERUSER(bot, event)))
-            # bypass group admin
-            and (
-                    (not config.nailong_bypass_admin)
-                    or ((not session.member.role) or session.member.role.level <= 1)
-            )
-            # msg has supported seg
-            and (any(True for x in msg if type(x) in source_extractors))
-            # self is admin
-            and (
-                    (not config.nailong_need_admin)
-                    or bool(
+        bool(session.member)  # this prop only exists in group chats
+        # user blacklist
+        and (session.user.id not in config.nailong_user_blacklist)
+        # scene blacklist or whitelist
+        and judge_list(
+            config.nailong_list_scenes,
+            session.scene_path,
+            config.nailong_blacklist,
+        )
+        # bypass superuser
+        and ((not config.nailong_bypass_superuser) or (not await SUPERUSER(bot, event)))
+        # bypass group admin
+        and (
+            (not config.nailong_bypass_admin)
+            or ((not session.member.role) or session.member.role.level <= 1)
+        )
+        # msg has supported seg
+        and (any(True for x in msg if type(x) in source_extractors))
+        # self is admin
+        and (
+            (not config.nailong_need_admin)
+            or bool(
                 (
                     self_info := await ss_interface.get_member(
                         session.scene.type,
@@ -77,12 +77,13 @@ async def nailong_rule(
                 and self_info.role
                 and self_info.role.level > 1,
             )
-            )
+        )
     )
 
 
 nailong = on_message(rule=Rule(nailong_rule), priority=config.nailong_priority)
 input_shape = config.nailong_model1_yolox_size or config.nailong_model1_type.yolox_size
+
 
 @nailong.handle()
 async def handle_function(bot: BaseBot, ev: BaseEvent, msg: UniMsg, session: Uninfo):
@@ -105,10 +106,13 @@ async def handle_function(bot: BaseBot, ev: BaseEvent, msg: UniMsg, session: Uni
                     break
             zip_filename = process_gif_and_save_jpgs(frames, label, input_shape)
             if zip_filename is None:
-                await nailong.finish(f"已保存数据到目录{config.nailong_model_dir}\\records\\{label}，标签：{label}")
+                await nailong.finish(
+                    f"已保存数据到目录{config.nailong_model_dir}\\records\\{label}，标签：{label}",
+                )
             else:
                 await nailong.finish(
-                    f"记录数据超过{config.nailong_similarity_max_storage}，已清除原记录数据，压缩并保存至{zip_filename}\n已保存数据到目录{config.nailong_model_dir}\\records\\{label}，标签：{label}")
+                    f"记录数据超过{config.nailong_similarity_max_storage}，已清除原记录数据，压缩并保存至{zip_filename}\n已保存数据到目录{config.nailong_model_dir}\\records\\{label}，标签：{label}",
+                )
         else:
             try:
                 check_res = await check(source)
@@ -124,7 +128,9 @@ async def handle_function(bot: BaseBot, ev: BaseEvent, msg: UniMsg, session: Uni
             if config.nailong_mute_seconds > 0:
                 functions.append(lambda: mute(bot, ev, config.nailong_mute_seconds))
             punish_ok = functions and (await execute_functions_any_ok(functions))
-            template_dict = config.nailong_tip if punish_ok else config.nailong_failed_tip
+            template_dict = (
+                config.nailong_tip if punish_ok else config.nailong_failed_tip
+            )
             template_str = template_dict[
                 check_res.label if (check_res.label in template_dict) else DEFAULT_LABEL
             ]

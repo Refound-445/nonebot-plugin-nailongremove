@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:5007274a43436d6abba9573181b8f32de6edb9a0b449a7396f0d02d3f60cbca4"
+content_hash = "sha256:59ee4c5c54486006974b67f21810dc5c0170ad13cd0d6d5d83afe1dacb5d4643"
 
 [[metadata.targets]]
 requires_python = "~=3.9"
@@ -1906,7 +1906,7 @@ version = "3.5.4"
 requires_python = ">=3.8"
 summary = "A python implementation of GNU readline."
 groups = ["dev"]
-marker = "sys_platform == \"win32\""
+marker = "sys_platform == \"win32\" and python_version >= \"3.8\""
 files = [
     {file = "pyreadline3-3.5.4-py3-none-any.whl", hash = "sha256:eaf8e6cc3c49bcccf145fc6067ba8643d1df34d604a1ec0eccbf7a18e6d3fae6"},
     {file = "pyreadline3-3.5.4.tar.gz", hash = "sha256:8d57d53039a1c75adba8e50dd3d992b28143480816187ea5efbd5c78e6c885b7"},

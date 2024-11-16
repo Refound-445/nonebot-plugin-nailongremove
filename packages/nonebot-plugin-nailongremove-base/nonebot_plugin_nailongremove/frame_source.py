@@ -128,8 +128,8 @@ async def _(source: PilImageFrameSource, frames: Iterator[np.ndarray]) -> Segmen
 
 
 def repack_save(
-        source: FrameSource,
-        frames: Iterator[np.ndarray],
+    source: FrameSource,
+    frames: Iterator[np.ndarray],
 ) -> Awaitable[Segment]:
     if (k := type(source)) not in repack_savers:
         raise NotImplementedError
@@ -180,7 +180,7 @@ async def extract_source(seg: Segment) -> FrameSource:
 
 
 async def iter_sources_in_message(
-        message: UniMessage,
+    message: UniMessage,
 ) -> AsyncIterator[Tuple[FrameSource, Segment]]:
     for seg in message:
         try:
