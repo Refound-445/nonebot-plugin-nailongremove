@@ -19,7 +19,8 @@ jobs:
       - name: Setup PDM
         uses: pdm-project/setup-pdm@v4
         with:
-          enable-pep582: true
+          python-version: 3.12
+          cache: true
 
       - name: Install project dependencies
         run: |-
@@ -28,8 +29,8 @@ jobs:
 
       - name: Run pre-commit
         run: |-
-          local ret=0
-          pdm run pre-commit run --all-files --show-diff-on-failure --color=always || ret=$?
+          RET=0
+          pdm run pre-commit run --all-files --show-diff-on-failure --color=always || RET=$?
 
           # push back changes
           if [[ -n "$(git status -s)" ]]; then
