@@ -228,9 +228,9 @@ pip install nonebot-plugin-nailongremove-base -U
 
 ### 可用模型
 
-- `0`：基于 Renet50 图像分类模型训练推理，感谢 @spawner1145 提供的模型，原链接：[spawner1145/NailongRecognize](https://github.com/spawner1145/NailongRecognize.git)
-- `1`：基于 YOLOX 目标检测模型训练推理，感谢 @NKXingXh 提供的模型，原链接：[nkxingxh/NailongDetection](https://github.com/nkxingxh/NailongDetection)
-- `2`：基于 YOLOv11 目标检测模型训练推理，感谢 @Hakureirm 提供的模型，原链接：[Hakureirm/NailongKiller](https://huggingface.co/spaces/Hakureirm/NailongKiller)
+- `0`：基于 Renet50 图像分类模型训练推理，感谢 [@spawner1145](https://github.com/spawner1145) 提供的模型，原链接：[spawner1145/NailongRecognize](https://github.com/spawner1145/NailongRecognize.git)
+- `1`：基于 YOLOX 目标检测模型训练推理，感谢 [@NKXingXh](https://github.com/nkxingxh) 提供的模型，原链接：[nkxingxh/NailongDetection](https://github.com/nkxingxh/NailongDetection)
+- `2`：基于 YOLOv11 目标检测模型训练推理，感谢 [@Hakureirm](https://github.com/Hakureirm) 提供的模型，原链接：[Hakureirm/NailongKiller](https://huggingface.co/Hakureirm/NailongKiller)
 
 ### 消息模板可用变量
 
