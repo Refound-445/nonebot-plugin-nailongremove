@@ -6,6 +6,7 @@ from typing import (
     Callable,
     Dict,
     Generic,
+    Iterable,
     Iterator,
     Tuple,
     Type,
@@ -27,6 +28,14 @@ from PIL import Image as Img, ImageSequence
 T = TypeVar("T")
 
 
+class FrameSaver(ABC, Generic[T]):
+    @abstractmethod
+    async def save(self, frames: Iterable[np.ndarray]) -> Segment: ...
+
+
+# class FrameSource(ABC, Sequence[T], Generic[T]):
+# TODO 实现 Sequence 的方法以便抽帧检测
+# 删除 __iter__，改为实现 __len__ 与 __getitem__
 class FrameSource(ABC, Generic[T]):
     def __init__(self, data: T) -> None:
         super().__init__()
@@ -35,34 +44,8 @@ class FrameSource(ABC, Generic[T]):
     @abstractmethod
     def __iter__(self) -> Iterator[np.ndarray]: ...
 
-
-class PilImageFrameSource(FrameSource[Img.Image]):
-    def __init__(self, data: Img.Image) -> None:
-        super().__init__(data)
-
-    @classmethod
-    def from_raw(cls, raw: bytes) -> Self:
-        return cls(Img.open(BytesIO(raw)))
-
-    @override
-    def __iter__(self) -> Iterator[np.ndarray]:
-        for frame in ImageSequence.Iterator(self.data):
-            image_array = np.array(frame.convert("RGB"))
-            image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
-            yield image_array
-
-
-TFS = TypeVar("TFS", bound=FrameSource)
-RepackSaver: TypeAlias = Callable[[TFS, Iterator[np.ndarray]], Awaitable[Segment]]
-repack_savers: Dict[Type[FrameSource], RepackSaver] = {}
-
-
-def repack_saver(t: Type[TFS]):
-    def deco(func: RepackSaver[TFS]):
-        repack_savers[t] = func
-        return func
-
-    return deco
+    @abstractmethod
+    def get_saver(self) -> FrameSaver[T]: ...
 
 
 # https://github.com/MeetWq/meme-generator/blob/main/meme_generator/utils.py#L60
@@ -103,6 +86,23 @@ def save_gif(frames: list[Img.Image], duration: float) -> BytesIO:
     return save_gif(new_frames, duration)
 
 
+class PilImageFrameSaver(FrameSaver[Img.Image]):
+    def __init__(self, duration: float) -> None:
+        super().__init__()
+        self.duration = duration
+
+    async def save(self, frames: Iterable[np.ndarray]) -> Segment:
+        frame_images = [
+            Img.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)) for frame in frames
+        ]
+        if len(frame_images) == 1:
+            bio = BytesIO()
+            frame_images[0].save(bio, format="PNG")
+        else:
+            bio = save_gif(frame_images, self.duration)
+        return Image(raw=bio)
+
+
 # https://github.com/MeetWq/meme-generator/blob/main/meme_generator/utils.py#L97
 def get_avg_duration(image: Img.Image) -> float:
     if not getattr(image, "is_animated", False):
@@ -114,26 +114,24 @@ def get_avg_duration(image: Img.Image) -> float:
     return total_duration / len(frames) / 1000
 
 
-@repack_saver(PilImageFrameSource)
-async def _(source: PilImageFrameSource, frames: Iterator[np.ndarray]) -> Segment:
-    frame_images = [
-        Img.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)) for frame in frames
-    ]
-    if len(frame_images) == 1:
-        bio = BytesIO()
-        frame_images[0].save(bio, format="PNG")
-    else:
-        bio = save_gif(frame_images, get_avg_duration(source.data))
-    return Image(raw=bio)
+class PilImageFrameSource(FrameSource[Img.Image]):
+    def __init__(self, data: Img.Image) -> None:
+        super().__init__(data)
 
+    @classmethod
+    def from_raw(cls, raw: bytes) -> Self:
+        return cls(Img.open(BytesIO(raw)))
 
-def repack_save(
-    source: FrameSource,
-    frames: Iterator[np.ndarray],
-) -> Awaitable[Segment]:
-    if (k := type(source)) not in repack_savers:
-        raise NotImplementedError
-    return repack_savers[k](source, frames)
+    @override
+    def __iter__(self) -> Iterator[np.ndarray]:
+        for frame in ImageSequence.Iterator(self.data):
+            image_array = np.array(frame.convert("RGB"))
+            image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
+            yield image_array
+
+    @override
+    def get_saver(self):
+        return PilImageFrameSaver(get_avg_duration(self.data))
 
 
 TS = TypeVar("TS", bound=Segment)

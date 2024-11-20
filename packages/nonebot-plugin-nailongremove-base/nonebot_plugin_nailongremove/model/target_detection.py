@@ -11,13 +11,13 @@ import numpy as np
 from cookit import with_semaphore
 from nonebot.utils import run_sync
 
-from ..config import config
-from ..frame_source import FrameSource, repack_save
+from ..config import MODEL1_DEFAULT_TYPE, MODEL1_YOLOX_SIZE_MAP, config
+from ..frame_source import FrameSource
 from .utils.common import CheckResult, CheckSingleResult, race_check
 from .utils.update import GitHubLatestReleaseModelUpdater, ModelInfo, UpdaterGroup
 from .utils.yolox import demo_postprocess, multiclass_nms, preprocess, vis
 
-model_filename_sfx = f"_{config.nailong_model1_type.value}.onnx"
+model_filename_sfx = f"_{config.nailong_model1_type}.onnx"
 
 
 class ModelUpdater(GitHubLatestReleaseModelUpdater):
@@ -49,7 +49,11 @@ session = onnxruntime.InferenceSession(
     model_path,
     providers=config.nailong_onnx_providers,
 )
-input_shape = config.nailong_model1_yolox_size or config.nailong_model1_type.yolox_size
+input_shape = (
+    config.nailong_model1_yolox_size
+    or MODEL1_YOLOX_SIZE_MAP.get(config.nailong_model1_type)
+    or MODEL1_YOLOX_SIZE_MAP[MODEL1_DEFAULT_TYPE]
+)
 
 
 @dataclass
@@ -97,7 +101,7 @@ def _check_single(frame: np.ndarray) -> CheckSingleResult[Optional[Detections]]:
     boxes_xyxy /= ratio
     dets = multiclass_nms(boxes_xyxy, scores, nms_thr=0.45, score_thr=0.1)
     if dets is None:
-        return CheckSingleResult.not_ok(None)
+        return CheckSingleResult()
 
     final_boxes, final_scores, final_cls_ids = (
         dets[:, :4],  # type: ignore
@@ -109,17 +113,15 @@ def _check_single(frame: np.ndarray) -> CheckSingleResult[Optional[Detections]]:
         expected = config.nailong_model1_score.get(label)
         if (expected is not None) and s >= expected:
             return CheckSingleResult(
-                ok=True,
                 label=label,
                 extra=Detections(final_boxes, final_scores, final_cls_ids),
             )
-    return CheckSingleResult.not_ok(None)
+    return CheckSingleResult()
 
 
 async def check_single(frame: np.ndarray) -> CheckSingleResult[FrameInfo]:
     res = await _check_single(frame)
     return CheckSingleResult(
-        ok=res.ok,
         label=res.label,
         extra=FrameInfo(frame, res.extra),
     )
@@ -133,15 +135,14 @@ async def check(source: FrameSource) -> CheckResult:
         results = await asyncio.gather(
             *(with_semaphore(sem)(check_single)(frame) for frame in source),
         )
-        ok = any(r.ok for r in results)
+        ok = any(r.label for r in results)
         if ok:
             all_labels = {r.label for r in results if r.label}
             label = next(
                 (x for x in config.nailong_model1_score if x in all_labels),
                 None,
             )
-            extra_vars["$checked_result"] = await repack_save(
-                source,
+            extra_vars["$checked_result"] = await source.get_saver().save(
                 (r.extra.vis() for r in results),
             )
     else:
@@ -149,8 +150,7 @@ async def check(source: FrameSource) -> CheckResult:
         ok = bool(res)
         if res:
             label = res.label
-            extra_vars["$checked_result"] = await repack_save(
-                source,
-                iter((res.extra.vis(),)),
+            extra_vars["$checked_result"] = await source.get_saver().save(
+                (res.extra.vis(),),
             )
-    return CheckResult(ok, label, extra_vars)
+    return CheckResult(label, extra_vars)

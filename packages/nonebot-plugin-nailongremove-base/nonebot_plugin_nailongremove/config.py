@@ -1,8 +1,7 @@
-from enum import Enum, auto
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from cookit import StrEnum
 from cookit.pyd import field_validator
 from nonebot import get_plugin_config
 from pydantic import BaseModel, Field
@@ -15,16 +14,12 @@ class ModelType(int, Enum):
     TARGET_DETECTION = 1
 
 
-class Model1Type(StrEnum):
-    TINY = auto()
-    M = auto()
-
-    @property
-    def yolox_size(self) -> Tuple[int, int]:
-        return {
-            Model1Type.TINY: (416, 416),
-            Model1Type.M: (640, 640),
-        }[self]
+MODEL1_YOLOX_SIZE_MAP = {
+    "tiny": (416, 416),
+    "m": (640, 640),
+    "m_beta": (640, 640),
+}
+MODEL1_DEFAULT_TYPE = "tiny"
 
 
 class Config(BaseModel):
@@ -56,7 +51,7 @@ class Config(BaseModel):
     nailong_concurrency: int = 1
     nailong_onnx_providers: List[str] = ["CPUExecutionProvider"]
 
-    nailong_model1_type: Model1Type = Model1Type.TINY
+    nailong_model1_type: str = MODEL1_DEFAULT_TYPE
     nailong_model1_yolox_size: Optional[Tuple[int, int]] = None
     nailong_model1_score: Dict[str, Optional[float]] = {
         DEFAULT_LABEL: 0.5,

@@ -13,24 +13,14 @@ T = TypeVar("T")
 
 @dataclass
 class CheckSingleResult(Generic[T]):
-    ok: bool
-    label: Optional[str]
-    extra: T
-
-    @classmethod
-    def not_ok(cls, extra: T):
-        return cls(ok=False, label=None, extra=extra)
+    label: Optional[str] = None
+    extra: T = None  # type: ignore
 
 
 @dataclass
 class CheckResult:
-    ok: bool
-    label: Optional[str]
+    label: Optional[str] = None
     extra_vars: Dict[str, Any] = field(default_factory=dict)
-
-    @classmethod
-    def not_ok(cls):
-        return cls(ok=False, label=None, extra_vars={})
 
 
 FrameChecker: TypeAlias = Callable[[np.ndarray], Awaitable[CheckSingleResult[T]]]
@@ -43,14 +33,14 @@ async def race_check(
 ) -> Optional[CheckSingleResult[T]]:
     iterator = iter(frames)
 
-    async def worker() -> CheckSingleResult:
+    async def worker() -> Optional[CheckSingleResult[T]]:
         while True:
             try:
                 frame = next(iterator)
             except StopIteration:
-                return CheckSingleResult.not_ok(None)
+                return None
             res = await checker(frame)
-            if res.ok:
+            if res.label:
                 return res
 
     tasks = [asyncio.create_task(worker()) for _ in range(concurrency)]
@@ -59,7 +49,7 @@ async def race_check(
             break
         done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
         for t in done:
-            if (res := t.result()).ok:
+            if (res := t.result()) and res.label:
                 for pt in pending:
                     pt.cancel()
                 return res

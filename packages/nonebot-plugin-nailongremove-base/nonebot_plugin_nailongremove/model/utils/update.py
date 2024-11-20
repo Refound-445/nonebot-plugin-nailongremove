@@ -193,7 +193,7 @@ class ModelUpdater(ABC):
                 f"Failed to get model info in {type(self).__name__}, skipping update: "
                 f"{type(e).__name__}: {e}",
             )
-            logger.debug("Stacktrace")
+            logger.opt(exception=e).debug("Stacktrace")
             return local
 
         model_path = self.get_path(info.filename)
@@ -222,7 +222,7 @@ class ModelUpdater(ABC):
                 logger.error(
                     f"Failed to update model, skipping: {type(e).__name__}: {e}",
                 )
-                logger.debug("Stacktrace")
+                logger.opt(exception=e).debug("Stacktrace")
                 return local
             else:
                 self.save_local_ver(info)
