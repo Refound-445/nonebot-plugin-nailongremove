@@ -90,7 +90,7 @@ async def handle_function(bot: BaseBot, ev: BaseEvent, msg: UniMsg, session: Uni
         except Exception:
             logger.exception(f"Failed to check {seg!r}")
             continue
-        if not check_res.ok:
+        if not check_res.label:
             continue
 
         functions: List[Callable[[], Awaitable[Any]]] = []

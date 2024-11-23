@@ -7,13 +7,14 @@ from typing import (
     Dict,
     Generic,
     Iterable,
-    Iterator,
+    Sequence,
     Tuple,
     Type,
     TypeVar,
+    Union,
     cast,
 )
-from typing_extensions import Self, TypeAlias, override
+from typing_extensions import Self, TypeAlias, overload, override
 
 import cv2
 import numpy as np
@@ -33,16 +34,21 @@ class FrameSaver(ABC, Generic[T]):
     async def save(self, frames: Iterable[np.ndarray]) -> Segment: ...
 
 
-# class FrameSource(ABC, Sequence[T], Generic[T]):
-# TODO 实现 Sequence 的方法以便抽帧检测
-# 删除 __iter__，改为实现 __len__ 与 __getitem__
-class FrameSource(ABC, Generic[T]):
+class FrameSource(ABC, Sequence[np.ndarray], Generic[T]):
     def __init__(self, data: T) -> None:
         super().__init__()
         self.data = data
 
+    @override
     @abstractmethod
-    def __iter__(self) -> Iterator[np.ndarray]: ...
+    def __len__(self) -> int: ...
+
+    @overload
+    @abstractmethod
+    def __getitem__(self, index: int) -> np.ndarray: ...
+    @overload
+    @abstractmethod
+    def __getitem__(self, index: slice) -> Sequence[np.ndarray]: ...
 
     @abstractmethod
     def get_saver(self) -> FrameSaver[T]: ...
@@ -117,17 +123,34 @@ def get_avg_duration(image: Img.Image) -> float:
 class PilImageFrameSource(FrameSource[Img.Image]):
     def __init__(self, data: Img.Image) -> None:
         super().__init__(data)
+        self.iterator = ImageSequence.Iterator(data)
+        self.length = sum(1 for _ in self.iterator)
 
     @classmethod
     def from_raw(cls, raw: bytes) -> Self:
         return cls(Img.open(BytesIO(raw)))
 
     @override
-    def __iter__(self) -> Iterator[np.ndarray]:
-        for frame in ImageSequence.Iterator(self.data):
-            image_array = np.array(frame.convert("RGB"))
-            image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
-            yield image_array
+    def __len__(self) -> int:
+        return self.length
+
+    @override
+    @overload
+    def __getitem__(self, index: int) -> np.ndarray: ...
+    @override
+    @overload
+    def __getitem__(self, index: slice) -> Sequence[np.ndarray]: ...
+    @override
+    def __getitem__(
+        self,
+        index: Union[int, slice],
+    ) -> Union[np.ndarray, Sequence[np.ndarray]]:
+        if isinstance(index, slice):
+            return [self[i] for i in range(*index.indices(self.length))]
+        return cv2.cvtColor(
+            np.array(self.iterator[index].convert("RGB")),
+            cv2.COLOR_BGR2RGB,
+        )
 
     @override
     def get_saver(self):

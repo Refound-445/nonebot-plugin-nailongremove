@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # Copyright (c) Megvii Inc. All rights reserved.
 
+# This File is derived from https://github.com/Megvii-BaseDetection/YOLOX/blob/main/yolox/utils/demo_utils.py
+# SPDX-License-Identifier: Apache-2.0
+
 # ruff: noqa: ANN001
 
 import cv2
