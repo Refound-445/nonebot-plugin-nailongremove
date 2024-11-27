@@ -87,7 +87,7 @@ def _check_single(
     is_gif: bool = False,
 ) -> CheckSingleResult[Optional[Detections]]:
     if is_gif:
-        res = similarity_process(frame, dsize=input_shape)
+        res = similarity_process(frame)
         if res is not None:
             return res
         return CheckSingleResult.not_ok(None)

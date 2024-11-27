@@ -37,7 +37,7 @@ SIZE = 224
 @run_sync
 def check_single(image: np.ndarray, is_gif: bool = False) -> CheckSingleResult[None]:
     if is_gif:
-        res = similarity_process(image, dsize=(SIZE, SIZE))
+        res = similarity_process(image)
         if res is not None:
             return res
         return CheckSingleResult.not_ok(None)

@@ -1,3 +1,4 @@
+import random
 import re
 from typing import Any, Awaitable, Callable, Iterable, List, TypeVar
 
@@ -104,14 +105,14 @@ async def handle_function(bot: BaseBot, ev: BaseEvent, msg: UniMsg, session: Uni
                     frames.append(temp_image)
                 except StopIteration:
                     break
-            zip_filename = process_gif_and_save_jpgs(frames, label, input_shape)
-            if zip_filename is None:
+            commitInfo = process_gif_and_save_jpgs(frames, label, (224,224))
+            if commitInfo is None:
                 await nailong.finish(
-                    f"已保存数据到目录{config.nailong_model_dir}\\records\\{label}，标签：{label}",
+                    f"The new data has been saved to the directory {config.nailong_model_dir}\\records\\{label}, label: {label}.",
                 )
             else:
                 await nailong.finish(
-                    f"记录数据超过{config.nailong_similarity_max_storage}，已清除原记录数据，压缩并保存至{zip_filename}\n已保存数据到目录{config.nailong_model_dir}\\records\\{label}，标签：{label}",
+                    f"The recorded data has exceeded {config.nailong_similarity_max_storage}, the original data has been cleared, compressed, and upload to {commitInfo.commit_url}\nThe new data has been saved to the directory {config.nailong_model_dir}\\records\\{label}, label: {label}.",
                 )
         else:
             try:
@@ -131,9 +132,12 @@ async def handle_function(bot: BaseBot, ev: BaseEvent, msg: UniMsg, session: Uni
             template_dict = (
                 config.nailong_tip if punish_ok else config.nailong_failed_tip
             )
-            template_str = template_dict[
+            template_str_all = template_dict[
                 check_res.label if (check_res.label in template_dict) else DEFAULT_LABEL
             ]
+            if len(template_str_all) == 0:
+                continue
+            template_str=template_str_all[random.randint(0, len(template_str_all) - 1)]
             mapping = {
                 "$event": ev,
                 "$target": msg.get_target(),

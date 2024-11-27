@@ -68,7 +68,7 @@ input_shape = config.nailong_model1_yolox_size or config.nailong_model1_type.yol
 @run_sync
 def _check_single(frame: np.ndarray, is_gif: bool = False) -> CheckSingleResult:
     if is_gif:
-        res = similarity_process(frame, dsize=input_shape)
+        res = similarity_process(frame)
         if res is not None:
             return CheckSingleResult(ok=res.ok, label=res.label, extra=frame)
         return CheckSingleResult(ok=False, label=None, extra=frame)

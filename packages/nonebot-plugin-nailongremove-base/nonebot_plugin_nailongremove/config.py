@@ -41,11 +41,11 @@ class Config(BaseModel):
 
     nailong_recall: bool = True
     nailong_mute_seconds: int = 0
-    nailong_tip: Dict[str, str] = {
-        DEFAULT_LABEL: "本群禁止发送奶龙！",
+    nailong_tip: Dict[str, List[str]] = {
+        DEFAULT_LABEL: ["本群禁止发送奶龙！"],
     }
-    nailong_failed_tip: Dict[str, str] = {
-        DEFAULT_LABEL: "{:Reply($message_id)}呜，不要发奶龙了嘛 🥺 👉👈",
+    nailong_failed_tip: Dict[str, List[str]] = {
+        DEFAULT_LABEL: ["{:Reply($message_id)}呜，不要发奶龙了嘛 🥺 👉👈"],
     }
     nailong_check_all_frames: bool = False
 
@@ -65,8 +65,8 @@ class Config(BaseModel):
     nailong_model2_online: bool = False
     nailong_check_mode: int = 0
     nailong_similarity_on: bool = False
-    nailong_similarity_max_storage: int = 10
-    nailong_similarity_max_batch_size: int = 10
+    nailong_similarity_max_storage: int = 1000
+    nailong_hf_token: Optional[str] = None
 
     nailong_github_token: Optional[str] = None
 
