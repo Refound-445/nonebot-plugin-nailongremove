@@ -29,6 +29,8 @@ if config.nailong_similarity_on:
     from nonebot import logger
     from torch import nn
     from torchvision import transforms
+    import sklearn
+
 
     transform = transforms.Compose(
         [
