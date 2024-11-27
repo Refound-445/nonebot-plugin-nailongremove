@@ -83,8 +83,8 @@ class FrameInfo:
 
 @run_sync
 def _check_single(
-    frame: np.ndarray,
-    is_gif: bool = False,
+        frame: np.ndarray,
+        is_gif: bool = False,
 ) -> CheckSingleResult[Optional[Detections]]:
     if is_gif:
         res = similarity_process(frame)
@@ -127,8 +127,8 @@ def _check_single(
 
 
 async def check_single(
-    frame: np.ndarray,
-    is_gif: bool = False,
+        frame: np.ndarray,
+        is_gif: bool = False,
 ) -> CheckSingleResult[FrameInfo]:
     if is_gif:
         res = await _check_single(frame, True)
