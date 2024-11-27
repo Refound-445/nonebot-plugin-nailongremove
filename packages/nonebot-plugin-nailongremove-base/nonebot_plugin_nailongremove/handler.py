@@ -105,7 +105,7 @@ async def handle_function(bot: BaseBot, ev: BaseEvent, msg: UniMsg, session: Uni
                     frames.append(temp_image)
                 except StopIteration:
                     break
-            commitInfo = process_gif_and_save_jpgs(frames, label, (224,224))
+            commitInfo = process_gif_and_save_jpgs(frames, label, (224, 224))
             if commitInfo is None:
                 await nailong.finish(
                     f"The new data has been saved to the directory {config.nailong_model_dir}\\records\\{label}, label: {label}.",
@@ -137,7 +137,9 @@ async def handle_function(bot: BaseBot, ev: BaseEvent, msg: UniMsg, session: Uni
             ]
             if len(template_str_all) == 0:
                 continue
-            template_str=template_str_all[random.randint(0, len(template_str_all) - 1)]
+            template_str = template_str_all[
+                random.randint(0, len(template_str_all) - 1)
+            ]
             mapping = {
                 "$event": ev,
                 "$target": msg.get_target(),

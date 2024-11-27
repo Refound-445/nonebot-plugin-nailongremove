@@ -38,7 +38,6 @@ else:
         file_path = os.path.join(str(config.nailong_model_dir), FILENAME)
         model_info = api.model_info(REPO_ID)
 
-
         def get_file_last_modified_time(file_path):
             try:
                 timestamp = os.path.getmtime(file_path)
@@ -49,7 +48,6 @@ else:
                 return last_modified_time
             except FileNotFoundError:
                 return None
-
 
         local_time = get_file_last_modified_time(file_path)
         if local_time is None or model_info.last_modified >= local_time:
@@ -78,7 +76,7 @@ def _check_single(frame: np.ndarray, is_gif: bool = False) -> CheckSingleResult:
         input_image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
 
         if not os.path.exists(
-                os.path.join(str(config.nailong_model_dir), "online_temp"),
+            os.path.join(str(config.nailong_model_dir), "online_temp"),
         ):
             os.makedirs(os.path.join(str(config.nailong_model_dir), "online_temp"))
         image_path = os.path.join(
@@ -102,8 +100,8 @@ def _check_single(frame: np.ndarray, is_gif: bool = False) -> CheckSingleResult:
         )
         os.remove(image_path)
         if (
-                "检测到的目标数量: " in result_info
-                and int(result_info.split("检测到的目标数量: ")[1].split("\n")[0]) < 1
+            "检测到的目标数量: " in result_info
+            and int(result_info.split("检测到的目标数量: ")[1].split("\n")[0]) < 1
         ):
             return CheckSingleResult(ok=False, label=None, extra=frame)
         if isinstance(result_image, str):
@@ -144,9 +142,9 @@ def _check_single(frame: np.ndarray, is_gif: bool = False) -> CheckSingleResult:
 
     if pad_w > 0 or pad_h > 0:
         result_img = result_img[
-                     pad_h // 2: pad_h // 2 + original_size[1],
-                     pad_w // 2: pad_w // 2 + original_size[0],
-                     ]
+            pad_h // 2 : pad_h // 2 + original_size[1],
+            pad_w // 2 : pad_w // 2 + original_size[0],
+        ]
     return CheckSingleResult(ok=True, label="nailong", extra=result_img)
 
 
