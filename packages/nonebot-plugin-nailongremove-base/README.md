@@ -192,8 +192,8 @@ pip install nonebot-plugin-nailongremove-base -U
 |             **全局配置**             |    |                                                           |                                                                                                                                                                                                                                    |
 |             `PROXY`              | 否  |                          `None`                           |                                                                                                          下载模型等文件时使用的代理地址                                                                                                           |
 |             **响应配置**             |    |                                                           |                                                                                                                                                                                                                                    |
-|    `NAILONG_BYPASS_SUPERUSER`    | 否  |                          `True`                           |                                                                                                           是否不检查超级用户发送的图片                                                                                                           |
-|      `NAILONG_BYPASS_ADMIN`      | 否  |                          `True`                           |                                                                                                          是否不检查群组管理员发送的图片                                                                                                           |
+|    `NAILONG_BYPASS_SUPERUSER`    | 否  |                          `False`                          |                                                                                                           是否不检查超级用户发送的图片                                                                                                           |
+|      `NAILONG_BYPASS_ADMIN`      | 否  |                          `False`                          |                                                                                                          是否不检查群组管理员发送的图片                                                                                                           |
 |       `NAILONG_NEED_ADMIN`       | 否  |                          `False`                          |                                                                                                       当自身不为群组管理员时是否不检查群内所有图片                                                                                                       |
 |      `NAILONG_LIST_SCENES`       | 否  |                           `[]`                            |                                                                       聊天场景 ID 黑白名单列表<br />在单级聊天下为该聊天 ID，如 QQ 群号；<br />在多级聊天下为以 `_` 分割的各级聊天 ID，如频道下的子频道或频道下私聊                                                                       |
 |       `NAILONG_BLACKLIST`        | 否  |                          `True`                           |                                                                                                             是否使用黑名单模式                                                                                                              |
@@ -231,6 +231,7 @@ pip install nonebot-plugin-nailongremove-base -U
 - `0`：基于 Renet50 图像分类模型训练推理，感谢 [@spawner1145](https://github.com/spawner1145) 提供的模型，原链接：[spawner1145/NailongRecognize](https://github.com/spawner1145/NailongRecognize.git)
 - `1`：基于 YOLOX 目标检测模型训练推理，感谢 [@NKXingXh](https://github.com/nkxingxh) 提供的模型，原链接：[nkxingxh/NailongDetection](https://github.com/nkxingxh/NailongDetection)
 - `2`：基于 YOLOv11 目标检测模型训练推理，感谢 [@Hakureirm](https://github.com/Hakureirm) 提供的模型，原链接：[Hakureirm/NailongKiller](https://huggingface.co/Hakureirm/NailongKiller)
+- `3`：基于 YOLOv11 目标检测模型训练推理，感谢 [@Threkork](https://github.com/Threkork) 提供的模型，原链接：[Threkork/kovi-plugin-check-alllong](https://github.com/Threkork/kovi-plugin-check-alllong)，建议`NAILONG_MODEL1_SCORE`配置项中设置`{"nailong": 0.78}`，`NAILONG_MODEL1_YOLOX_SIZE`设置为`[640,640]`
 
 ### 消息模板可用变量
 
@@ -258,6 +259,12 @@ pip install nonebot-plugin-nailongremove-base -U
 欢迎大家进群一起学习交流~
 
 ## 📝 更新日志
+
+### 2.3.4
+
+- `NAILONG_MODEL`加入model3，基于YOLOv11训练的模型，建议`NAILONG_MODEL1_SCORE`配置项中设置`{"nailong": 0.78}`，`NAILONG_MODEL1_YOLOX_SIZE`设置为`[640,640]`
+- 更新配置项默认值`NAILONG_BYPASS_SUPERUSER`->`False`，`NAILONG_BYPASS_ADMIN`->`False`
+
 
 ### 2.3.3
 

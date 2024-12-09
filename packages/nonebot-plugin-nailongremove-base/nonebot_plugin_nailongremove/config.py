@@ -14,6 +14,8 @@ class ModelType(int, Enum):
     CLASSIFICATION = 0
     TARGET_DETECTION = 1
     HF_DETECTION = 2
+    HF_YOLO = 3
+
 
 
 class Model1Type(StrEnum):
@@ -31,8 +33,8 @@ class Model1Type(StrEnum):
 class Config(BaseModel):
     proxy: Optional[str] = None
 
-    nailong_bypass_superuser: bool = True
-    nailong_bypass_admin: bool = True
+    nailong_bypass_superuser: bool = False
+    nailong_bypass_admin: bool = False
     nailong_need_admin: bool = False
     nailong_list_scenes: List[str] = Field(default_factory=list)
     nailong_blacklist: bool = True

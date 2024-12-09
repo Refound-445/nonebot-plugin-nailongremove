@@ -21,6 +21,7 @@ T = TypeVar("T")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 if config.nailong_similarity_on:
+    os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
     import json
 
     import faiss
@@ -30,7 +31,6 @@ if config.nailong_similarity_on:
     from torch import nn
     from torchvision import transforms
     import sklearn
-
     transform = transforms.Compose(
         [
             transforms.ToTensor(),
@@ -47,7 +47,7 @@ if config.nailong_similarity_on:
     ):
         def __init__(self):
             super().__init__()
-            self.resnet = torchvision.models.resnet18(pretrained=False)
+            self.resnet = torchvision.models.resnet18(weights=None)
             self.resnet.fc = nn.Linear(
                 self.resnet.fc.in_features,
                 5,
@@ -57,7 +57,7 @@ if config.nailong_similarity_on:
             return self.resnet(x)
 
     features_model = MyModel.from_pretrained(
-        "refoundd/NailongFeatures",
+        "refoundd/NailongFeatures",cache_dir=config.nailong_model_dir
     ).to(device)
     index_path = config.nailong_model_dir / "records.index"
     json_path = config.nailong_model_dir / "records.json"

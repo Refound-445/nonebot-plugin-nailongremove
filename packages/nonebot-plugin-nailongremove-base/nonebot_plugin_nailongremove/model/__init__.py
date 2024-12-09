@@ -34,7 +34,7 @@ elif config.nailong_model is ModelType.TARGET_DETECTION:
             "and use CPU to compute.",
         ) from e
 
-elif config.nailong_model is ModelType.HF_DETECTION:
+elif config.nailong_model is ModelType.HF_DETECTION or config.nailong_model is ModelType.HF_YOLO:
     from .hf_detection import check as check
 
 else:
