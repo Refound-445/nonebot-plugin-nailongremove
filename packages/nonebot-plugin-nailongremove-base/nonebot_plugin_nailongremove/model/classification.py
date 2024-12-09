@@ -49,7 +49,6 @@ def check_single(image: np.ndarray, is_gif: bool = False) -> CheckSingleResult[N
     image = image.unsqueeze(0)  # type: ignore
     with torch.no_grad():
         output = model(image.to(device))  # type: ignore
-        print(output)
         _, pred = torch.max(output, 1)
         return CheckSingleResult(
             ok=pred.item() == 1,
