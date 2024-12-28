@@ -77,7 +77,7 @@ still occur to varying degrees. Feedback is welcome!
 ## 💿 Installation
 
 **If you are new to NoneBot, please refer
-to [this guide](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/docs/tutorial.md)**
+to [this guide](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/docs/tutorial_en.md)**
 
 To avoid dependency issues, we've separated the installation methods for using GPU inference from the regular
 installation. Choose the one that suits your needs.
