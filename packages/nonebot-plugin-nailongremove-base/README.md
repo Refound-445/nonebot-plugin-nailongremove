@@ -45,6 +45,13 @@ _✨ 一个基于 AI 模型的简单插件~ ✨_
 
 </div>
 
+<h4 align="center">
+    <p>
+        <b>简体中文</b> |
+        <a href="https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/i18n/README_en.md">English</a> |
+    </p>
+</h4>
+
 ## 📖 介绍
 
 ### 声明
