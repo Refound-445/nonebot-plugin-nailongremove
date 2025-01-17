@@ -219,11 +219,12 @@ Add the required configurations from the table below to the `.env` file in your 
 | `NAILONG_USER_BLACKLIST`               | No       | `[]`                                                                                      | List of user IDs to be blacklisted.                                                                                                                                                                                                          |
 | `NAILONG_PRIORITY`                     | No       | `100`                                                                                     | Matcher priority.                                                                                                                                                                                                                            |
 | **Behavior Configuration**             |          |                                                                                           |                                                                                                                                                                                                                                              |
-| `NAILONG_RECALL`                       | No       | `True`                                                                                    | Whether to recall the message.                                                                                                                                                                                                               |
-| `NAILONG_MUTE_SECONDS`                 | No       | `0`                                                                                       | Time to mute, 0 means no mute (in seconds).                                                                                                                                                                                                  |
+| `NAILONG_RECALL`                       | No       | `["nailong"]`                                                                             | Whether to recall the message                                                                                                                                                                                                                |
+| `NAILONG_MUTE_SECONDS`                 | No       | `{"nailong":0}`                                                                           | Set the mute duration. If not set or the duration is 0, no mute will be applied.<br/>Unit: seconds                                                                                                                                           |                                                                                                                                      |
 | `NAILONG_TIP`                          | No       | `{"nailong": ["This group prohibits NaiLong images!"]}`                                   | Message to send as a tip, using [Alconna message template](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E4%BD%BF%E7%94%A8%E6%B6%88%E6%81%AF%E6%A8%A1%E6%9D%BF) with custom variables.                                              |
 | `NAILONG_FAILED_TIP`                   | No       | `{"nailong": ["{:Reply($message_id)} Oh no, please don't send NaiLong images! 🥺 👉👈"]}` | Message sent when recalling fails or when recalling is disabled.                                                                                                                                                                             |
 | `NAILONG_CHECK_ALL_FRAMES`             | No       | `False`                                                                                   | Specifies whether to check all frames in the image when using model 1. Requires setting `NAILONG_CHECK_MODE` to 0. When enabled, the `$checked_result` variable in the message template will return a GIF if the original image is animated. |
+| `NAILONG_CHECK_RATE`                   | No       | `0.8`                                                                                     | When checking all frames of an image, the image will only be recalled or processed if a certain proportion of the frames meet the detection criteria.                                                                                        |
 | `NAILONG_CHECK_MODE`                   | No       | `0`                                                                                       | Selects the detection method for GIF animations.<br/>0. Check all frames<br/>1. Check only the first frame<br/>2. Random frame sampling                                                                                                      |
 | **Similarity Detection Configuration** |          |                                                                                           |                                                                                                                                                                                                                                              |
 | `NAILONG_SIMILARITY_ON`                | No       | `False`                                                                                   | Specifies whether to enable similarity detection on local storage before processing images.                                                                                                                                                  |
@@ -292,6 +293,14 @@ Welcome everyone to join the group for learning and exchange!
 
 ## 📝 Changelog
 
+### 2.3.5
+
+- The update adds a feature to select a mute tag, allowing users to choose whether to mute or recall the processing for
+  different types of images.
+- A new configuration option, `NAILONG_CHECK_RATE`, has been added. When detecting all frames of an animated image, this
+  optional configuration allows success in judgment when the proportion of frames containing the "nailong" frame reaches
+  a certain threshold.
+
 ### 2.3.4
 
 - Added `model3` to `NAILONG_MODEL`, a model trained based on YOLOv11. It is recommended to set `{"nailong": 0.78}` in
@@ -301,26 +310,38 @@ Welcome everyone to join the group for learning and exchange!
 
 ### 2.3.3
 
-- Optimized temporary processing solutions to reduce performance pressure and improve speed (the vector library faiss also supports GPU processing, but it is not recommended for non-professionals to use GPU due to the complex installation process).
+- Optimized temporary processing solutions to reduce performance pressure and improve speed (the vector library faiss
+  also supports GPU processing, but it is not recommended for non-professionals to use GPU due to the complex
+  installation process).
 - Added `NAILONG_HF_TOKEN` to automatically upload errored images to the Hugging Face dataset.
-- Changed the formats of the configuration items `NAILONG_TIP` and `NAILONG_FAILED_TIP`, allowing random response messages. When the corresponding value is an empty list `[]`, only the image will be checked (or the mute/revoke action will be performed) without returning a message.
+- Changed the formats of the configuration items `NAILONG_TIP` and `NAILONG_FAILED_TIP`, allowing random response
+  messages. When the corresponding value is an empty list `[]`, only the image will be checked (or the mute/revoke
+  action will be performed) without returning a message.
 
 ### 2.3.2
 
 - Updated the three frame processing modes for GIFs. You can choose through `NAILONG_CHECK_MODE`.
-- Updated the temporary handling for errored images. By enabling `NAILONG_SIMILARITY_ON`, local storage similarity matching can be used. Additionally, by sending "This is [type]"+image through `SUPERUSERS`, errored images can be saved to local records.
-- Added `model2` to `NAILONG_MODEL`, which is based on the YOLOv11-trained model. Currently, it only supports Nailong recognition.
+- Updated the temporary handling for errored images. By enabling `NAILONG_SIMILARITY_ON`, local storage similarity
+  matching can be used. Additionally, by sending "This is [type]"+image through `SUPERUSERS`, errored images can be
+  saved to local records.
+- Added `model2` to `NAILONG_MODEL`, which is based on the YOLOv11-trained model. Currently, it only supports Nailong
+  recognition.
 
 ### 2.3.1
 
-- Modified plugin dependencies to avoid some issues that affected the installation process. Please refer to the installation documentation for more details.
-  - Corresponding configuration changes: Removed the `NAILONG_ONNX_TRY_TO_USE_GPU` configuration item and added the `NAILONG_ONNX_PROVIDERS` configuration item.
+- Modified plugin dependencies to avoid some issues that affected the installation process. Please refer to the
+  installation documentation for more details.
+    - Corresponding configuration changes: Removed the `NAILONG_ONNX_TRY_TO_USE_GPU` configuration item and added
+      the `NAILONG_ONNX_PROVIDERS` configuration item.
 
 ### 2.3.0
 
-- Added support for checking all frames in a GIF and re-encapsulating the results into a new GIF. This is disabled by default. The `$checked_image` variable has been deprecated, and a new `$checked_result` variable has been added.
-- The input size for model 1 can now be automatically configured based on the model type, but if specified in the configuration, it will be used as the priority.
-- Supported processing of images containing other tags. Some configuration items now allow custom values based on the tags.
+- Added support for checking all frames in a GIF and re-encapsulating the results into a new GIF. This is disabled by
+  default. The `$checked_image` variable has been deprecated, and a new `$checked_result` variable has been added.
+- The input size for model 1 can now be automatically configured based on the model type, but if specified in the
+  configuration, it will be used as the priority.
+- Supported processing of images containing other tags. Some configuration items now allow custom values based on the
+  tags.
 - Added a user blacklist.
 - The default model has been changed to 1.
 
@@ -333,7 +354,8 @@ Welcome everyone to join the group for learning and exchange!
 - Renamed the configuration item `NAILONG_YOLOX_SIZE` to `NAILONG_MODEL1_YOLOX_SIZE`.
 - Model 1 can now automatically get the latest version, and you can also choose the model type through configuration.
 - Model 1 can now control the confidence threshold for recognition via configuration.
-- When loading the ONNX model, the system will attempt to use GPU by default. If it fails, a warning will be shown. If you don't want to see the warning, you can refer to the above to disable the corresponding configuration.
+- When loading the ONNX model, the system will attempt to use GPU by default. If it fails, a warning will be shown. If
+  you don't want to see the warning, you can refer to the above to disable the corresponding configuration.
 
 ### 2.1.4
 

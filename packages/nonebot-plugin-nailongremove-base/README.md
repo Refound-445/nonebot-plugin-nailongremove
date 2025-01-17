@@ -69,7 +69,8 @@ NaiLongRemove 是一款由简单的 AI 模型建立的奶龙识别插件，可�
 
 ## 💿 安装
 
-**如果你从来没接触过 NoneBot，请查看 [这个文档](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/docs/tutorial.md)**
+**如果你从来没接触过
+NoneBot，请查看 [这个文档](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/docs/tutorial.md)**
 
 为避免依赖问题，我们把使用 GPU 推理的插件安装方式与普通安装分开了，供有需要的用户选择安装
 
@@ -207,11 +208,12 @@ pip install nonebot-plugin-nailongremove-base -U
 |     `NAILONG_USER_BLACKLIST`     | 否  |                           `[]`                            |                                                                                                            用户 ID 黑名单列表                                                                                                             |
 |        `NAILONG_PRIORITY`        | 否  |                           `100`                           |                                                                                                            Matcher 优先级                                                                                                             |
 |             **行为配置**             |    |                                                           |                                                                                                                                                                                                                                    |
-|         `NAILONG_RECALL`         | 否  |                          `True`                           |                                                                                                               是否撤回消息                                                                                                               |
-|      `NAILONG_MUTE_SECONDS`      | 否  |                            `0`                            |                                                                                                     设置禁言时间，默认为 0 即不禁言<br/>单位：秒                                                                                                     |
+|         `NAILONG_RECALL`         | 否  |                       `["nailong"]`                       |                                                                                                               是否撤回消息                                                                                                               |
+|      `NAILONG_MUTE_SECONDS`      | 否  |                      `{"nailong":0}`                      |                                                                                                  设置禁言时间，未被设置或者设置时间为0即不禁言<br/>单位：秒                                                                                                  |
 |          `NAILONG_TIP`           | 否  |                `{"nailong": ["本群禁止发奶龙！"]}`                | 发送的提示，使用 [Alconna 的消息模板](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E4%BD%BF%E7%94%A8%E6%B6%88%E6%81%AF%E6%A8%A1%E6%9D%BF)，可用变量见下，可以根据标签自定义对应值，随机发送列表其中一条消息，<br/>如遇其中没有的标签会回退到 `nailong`<br/>如果对应值为空列表`[]`，则会检测而不会发送消息 |
 |       `NAILONG_FAILED_TIP`       | 否  | `{"nailong": ["{:Reply($message_id)}呜，不要发奶龙了嘛 🥺 👉👈"]}` |                                                                                                         撤回失败或禁用撤回时发送的提示，同上                                                                                                         |
 |    `NAILONG_CHECK_ALL_FRAMES`    | 否  |                          `False`                          |                                                                   使用模型 1 时是否检查图片中的所有帧，需要同时设置`NAILONG_CHECK_MODE`为0，启用该项后消息模板中的 `$checked_result` 变量当原图为动图时会变为动图                                                                    |
+|       `NAILONG_CHECK_RATE`       | 否  |                           `0.8`                           |                                                                                                 检查图片中的所有帧时，当被检测到的图片满足一定比例时才会被撤回等处理                                                                                                 |
 |       `NAILONG_CHECK_MODE`       | 否  |                            `0`                            |                                                                                        选择对GIF动图的检测方式<br/>0.检测所有帧<br/>1.只检测第一帧<br/>2.随机抽帧检测                                                                                         |
 |           **相似度检测配置**            |    |                                                           |                                                                                                                                                                                                                                    |
 |     `NAILONG_SIMILARITY_ON`      | 否  |                          `False`                          |                                                                                                       是否启用处理图片前对本地存储进行相似度检测                                                                                                        |
@@ -235,20 +237,25 @@ pip install nonebot-plugin-nailongremove-base -U
 
 ### 可用模型
 
-- `0`：基于 Renet50 图像分类模型训练推理，感谢 [@spawner1145](https://github.com/spawner1145) 提供的模型，原链接：[spawner1145/NailongRecognize](https://github.com/spawner1145/NailongRecognize.git)
-- `1`：基于 YOLOX 目标检测模型训练推理，感谢 [@NKXingXh](https://github.com/nkxingxh) 提供的模型，原链接：[nkxingxh/NailongDetection](https://github.com/nkxingxh/NailongDetection)
-- `2`：基于 YOLOv11 目标检测模型训练推理，感谢 [@Hakureirm](https://github.com/Hakureirm) 提供的模型，原链接：[Hakureirm/NailongKiller](https://huggingface.co/Hakureirm/NailongKiller)
-- `3`：基于 YOLOv11 目标检测模型训练推理，感谢 [@Threkork](https://github.com/Threkork) 提供的模型，原链接：[Threkork/kovi-plugin-check-alllong](https://github.com/Threkork/kovi-plugin-check-alllong)，建议`NAILONG_MODEL1_SCORE`配置项中设置`{"nailong": 0.78}`，`NAILONG_MODEL1_YOLOX_SIZE`设置为`[640,640]`
+- `0`：基于 Renet50 图像分类模型训练推理，感谢 [@spawner1145](https://github.com/spawner1145)
+  提供的模型，原链接：[spawner1145/NailongRecognize](https://github.com/spawner1145/NailongRecognize.git)
+- `1`：基于 YOLOX 目标检测模型训练推理，感谢 [@NKXingXh](https://github.com/nkxingxh)
+  提供的模型，原链接：[nkxingxh/NailongDetection](https://github.com/nkxingxh/NailongDetection)
+- `2`：基于 YOLOv11 目标检测模型训练推理，感谢 [@Hakureirm](https://github.com/Hakureirm)
+  提供的模型，原链接：[Hakureirm/NailongKiller](https://huggingface.co/Hakureirm/NailongKiller)
+- `3`：基于 YOLOv11 目标检测模型训练推理，感谢 [@Threkork](https://github.com/Threkork)
+  提供的模型，原链接：[Threkork/kovi-plugin-check-alllong](https://github.com/Threkork/kovi-plugin-check-alllong)
+  ，建议`NAILONG_MODEL1_SCORE`配置项中设置`{"nailong": 0.78}`，`NAILONG_MODEL1_YOLOX_SIZE`设置为`[640,640]`
 
 ### 消息模板可用变量
 
-| 变量名            | 类型                                                                                                                         | 说明                                              |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| `$event`          | [`Event`](https://nonebot.dev/docs/api/adapters/#Event)                                                                      | 当前事件                                          |
-| `$target`         | [`Target`](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E6%B6%88%E6%81%AF%E5%8F%91%E9%80%81%E5%AF%B9%E8%B1%A1)     | 事件目标                                          |
-| `$message_id`     | `str`                                                                                                                        | 消息 ID                                           |
-| `$msg`            | [`UniMessage`](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E9%80%9A%E7%94%A8%E6%B6%88%E6%81%AF%E5%BA%8F%E5%88%97) | 当前消息                                          |
-| `$ss`             | [`Session`](https://github.com/RF-Tar-Railt/nonebot-plugin-uninfo?tab=readme-ov-file#session)                                | 当前会话                                          |
+| 变量名               | 类型                                                                                                                           | 说明                          |
+|-------------------|------------------------------------------------------------------------------------------------------------------------------|-----------------------------|
+| `$event`          | [`Event`](https://nonebot.dev/docs/api/adapters/#Event)                                                                      | 当前事件                        |
+| `$target`         | [`Target`](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E6%B6%88%E6%81%AF%E5%8F%91%E9%80%81%E5%AF%B9%E8%B1%A1)     | 事件目标                        |
+| `$message_id`     | `str`                                                                                                                        | 消息 ID                       |
+| `$msg`            | [`UniMessage`](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E9%80%9A%E7%94%A8%E6%B6%88%E6%81%AF%E5%BA%8F%E5%88%97) | 当前消息                        |
+| `$ss`             | [`Session`](https://github.com/RF-Tar-Railt/nonebot-plugin-uninfo?tab=readme-ov-file#session)                                | 当前会话                        |
 | `$checked_result` | [`Image`](https://nonebot.dev/docs/best-practice/alconna/uniseg#%E9%80%9A%E7%94%A8%E6%B6%88%E6%81%AF%E6%AE%B5)               | 框选出对应目标后的图片，仅在模型配置为 `1` 时存在 |
 
 ## 🎉 使用
@@ -267,11 +274,16 @@ pip install nonebot-plugin-nailongremove-base -U
 
 ## 📝 更新日志
 
+### 2.3.5
+
+- 更新可以增加禁言标签选择功能，分别对不同种类的图片选择是否禁言或者撤回处理
+- 增加配置项`NAILONG_CHECK_RATE`，检测动图的全部帧时，可选配置全部帧出现奶龙帧到某个比例时成功判定
+
 ### 2.3.4
 
-- `NAILONG_MODEL`加入model3，基于YOLOv11训练的模型，建议`NAILONG_MODEL1_SCORE`配置项中设置`{"nailong": 0.78}`，`NAILONG_MODEL1_YOLOX_SIZE`设置为`[640,640]`
+- `NAILONG_MODEL`加入model3，基于YOLOv11训练的模型，建议`NAILONG_MODEL1_SCORE`
+  配置项中设置`{"nailong": 0.78}`，`NAILONG_MODEL1_YOLOX_SIZE`设置为`[640,640]`
 - 更新配置项默认值`NAILONG_BYPASS_SUPERUSER`->`False`，`NAILONG_BYPASS_ADMIN`->`False`
-
 
 ### 2.3.3
 
@@ -282,13 +294,14 @@ pip install nonebot-plugin-nailongremove-base -U
 ### 2.3.2
 
 - 更新对GIF动图的三种帧处理模式，通过`NAILONG_CHECK_MODE`自行选择
-- 更新对于报错图片临时处理方案，通过设置`NAILONG_SIMILARITY_ON`开启浏览本地存储相似度匹配，通过`SUPERUSERS`发送"这是[种类]"+图片，可将报错图片保存到本地记录
+- 更新对于报错图片临时处理方案，通过设置`NAILONG_SIMILARITY_ON`开启浏览本地存储相似度匹配，通过`SUPERUSERS`发送"
+  这是[种类]"+图片，可将报错图片保存到本地记录
 - `NAILONG_MODEL`加入model2，基于YOLOv11训练的模型，目前仅支持奶龙识别
 
 ### 2.3.1
 
 - 修改插件依赖以避免一些问题，影响了安装过程，请查看安装文档了解
-  - 对应配置项修改：删除配置项 `NAILONG_ONNX_TRY_TO_USE_GPU`，添加配置项 `NAILONG_ONNX_PROVIDERS`
+    - 对应配置项修改：删除配置项 `NAILONG_ONNX_TRY_TO_USE_GPU`，添加配置项 `NAILONG_ONNX_PROVIDERS`
 
 ### 2.3.0
 

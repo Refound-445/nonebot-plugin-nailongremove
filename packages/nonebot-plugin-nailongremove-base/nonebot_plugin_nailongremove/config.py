@@ -41,8 +41,8 @@ class Config(BaseModel):
     nailong_user_blacklist: List[str] = Field(default_factory=list)
     nailong_priority: int = 100
 
-    nailong_recall: bool = True
-    nailong_mute_seconds: int = 0
+    nailong_recall: List[str] = ["nailong"]
+    nailong_mute_seconds: Dict[str,int] = {"nailong":0}
     nailong_tip: Dict[str, List[str]] = {
         DEFAULT_LABEL: ["本群禁止发送奶龙！"],
     }
@@ -50,6 +50,7 @@ class Config(BaseModel):
         DEFAULT_LABEL: ["{:Reply($message_id)}呜，不要发奶龙了嘛 🥺 👉👈"],
     }
     nailong_check_all_frames: bool = False
+    nailong_check_rate: float = 0.8
 
     nailong_model_dir: Path = Field(
         default_factory=lambda: Path.cwd() / "data" / "nailongremove",

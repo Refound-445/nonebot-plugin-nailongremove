@@ -83,8 +83,8 @@ class FrameInfo:
 
 @run_sync
 def _check_single(
-    frame: np.ndarray,
-    is_gif: bool = False,
+        frame: np.ndarray,
+        is_gif: bool = False,
 ) -> CheckSingleResult[Optional[Detections]]:
     if is_gif:
         res = similarity_process(frame)
@@ -127,8 +127,8 @@ def _check_single(
 
 
 async def check_single(
-    frame: np.ndarray,
-    is_gif: bool = False,
+        frame: np.ndarray,
+        is_gif: bool = False,
 ) -> CheckSingleResult[FrameInfo]:
     if is_gif:
         res = await _check_single(frame, True)
@@ -158,7 +158,7 @@ async def check(source: FrameSource) -> CheckResult:
                     for frame in tem_source
                 ),
             )
-            ok = any(r.ok for r in results)
+            ok = True if sum(1 for r in results if r.ok) / len(results) >= config.nailong_check_rate else False
         else:
             ok = False
         if not ok:
@@ -166,7 +166,7 @@ async def check(source: FrameSource) -> CheckResult:
             results = await asyncio.gather(
                 *(with_semaphore(sem)(check_single)(frame) for frame in source),
             )
-            ok = any(r.ok for r in results)
+            ok = True if sum(1 for r in results if r.ok) / len(results) >= config.nailong_check_rate else False
         if ok:
             all_labels = {r.label for r in results if r.label}
             label = next(

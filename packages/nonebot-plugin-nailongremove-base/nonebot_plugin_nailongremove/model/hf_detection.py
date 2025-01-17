@@ -185,7 +185,7 @@ async def check(source: FrameSource) -> CheckResult:
                     for frame in tem_source
                 ),
             )
-            ok = any(r.ok for r in results)
+            ok = True if sum(1 for r in results if r.ok) / len(results) >= config.nailong_check_rate else False
         else:
             ok = False
         if not ok:
@@ -193,7 +193,7 @@ async def check(source: FrameSource) -> CheckResult:
             results = await asyncio.gather(
                 *(with_semaphore(sem)(check_single)(frame) for frame in source),
             )
-            ok = any(r.ok for r in results)
+            ok = True if sum(1 for r in results if r.ok) / len(results) >= config.nailong_check_rate else False
         if ok:
             all_labels = {r.label for r in results if r.label}
             label = next(

@@ -23,7 +23,7 @@ def judge_list(lst: Iterable[T], val: T, blacklist: bool) -> bool:
 
 
 async def execute_functions_any_ok(
-    func: Iterable[Callable[[], Awaitable[Any]]],
+        func: Iterable[Callable[[], Awaitable[Any]]],
 ) -> bool:
     ok = False
     for f in func:
@@ -38,36 +38,36 @@ async def execute_functions_any_ok(
 
 
 async def nailong_rule(
-    bot: BaseBot,
-    event: BaseEvent,
-    session: Uninfo,
-    ss_interface: QryItrface,
-    msg: UniMsg,
+        bot: BaseBot,
+        event: BaseEvent,
+        session: Uninfo,
+        ss_interface: QryItrface,
+        msg: UniMsg,
 ) -> bool:
     return (
         # check if it's a group chat
-        bool(session.member)  # this prop only exists in group chats
-        # user blacklist
-        and (session.user.id not in config.nailong_user_blacklist)
-        # scene blacklist or whitelist
-        and judge_list(
-            config.nailong_list_scenes,
-            session.scene_path,
-            config.nailong_blacklist,
-        )
-        # bypass superuser
-        and ((not config.nailong_bypass_superuser) or (not await SUPERUSER(bot, event)))
-        # bypass group admin
-        and (
-            (not config.nailong_bypass_admin)
-            or ((not session.member.role) or session.member.role.level <= 1)
-        )
-        # msg has supported seg
-        and (any(True for x in msg if type(x) in source_extractors))
-        # self is admin
-        and (
-            (not config.nailong_need_admin)
-            or bool(
+            bool(session.member)  # this prop only exists in group chats
+            # user blacklist
+            and (session.user.id not in config.nailong_user_blacklist)
+            # scene blacklist or whitelist
+            and judge_list(
+        config.nailong_list_scenes,
+        session.scene_path,
+        config.nailong_blacklist,
+    )
+            # bypass superuser
+            and ((not config.nailong_bypass_superuser) or (not await SUPERUSER(bot, event)))
+            # bypass group admin
+            and (
+                    (not config.nailong_bypass_admin)
+                    or ((not session.member.role) or session.member.role.level <= 1)
+            )
+            # msg has supported seg
+            and (any(True for x in msg if type(x) in source_extractors))
+            # self is admin
+            and (
+                    (not config.nailong_need_admin)
+                    or bool(
                 (
                     self_info := await ss_interface.get_member(
                         session.scene.type,
@@ -78,7 +78,7 @@ async def nailong_rule(
                 and self_info.role
                 and self_info.role.level > 1,
             )
-        )
+            )
     )
 
 
@@ -124,10 +124,11 @@ async def handle_function(bot: BaseBot, ev: BaseEvent, msg: UniMsg, session: Uni
                 continue
 
             functions: List[Callable[[], Awaitable[Any]]] = []
-            if config.nailong_recall:
+            if check_res.label in config.nailong_recall:
                 functions.append(lambda: recall(bot, ev))
-            if config.nailong_mute_seconds > 0:
-                functions.append(lambda: mute(bot, ev, config.nailong_mute_seconds))
+            if check_res.label in config.nailong_mute_seconds.keys() and config.nailong_mute_seconds[
+                check_res.label] > 0:
+                functions.append(lambda: mute(bot, ev, config.nailong_mute_seconds[check_res.label]))
             punish_ok = functions and (await execute_functions_any_ok(functions))
             template_dict = (
                 config.nailong_tip if punish_ok else config.nailong_failed_tip
