@@ -76,13 +76,19 @@ still occur to varying degrees. Feedback is welcome!
 
 ## 💿 Installation
 
+### Cloud Deployment
+
+The [run_with_napcat_en.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat_en.ipynb) file supports one-click deployment on platforms like Kaggle or Huggingface's Spaces. You can complete the bot deployment simply by clicking "Run" and scanning the QR code!
+
+### Local Deployment
+
 **If you are new to NoneBot, please refer
 to [this guide](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/docs/tutorial_en.md)**
 
 To avoid dependency issues, we've separated the installation methods for using GPU inference from the regular
 installation. Choose the one that suits your needs.
 
-### Using CPU Inference
+#### Using CPU Inference
 
 You can choose one of the following methods.
 
@@ -146,7 +152,7 @@ plugins = [
 
 </details>
 
-### Using GPU Inference
+#### Using GPU Inference
 
 <details>
 <summary>Click to expand</summary>
@@ -275,8 +281,6 @@ Add the required configurations from the table below to the `.env` file in your 
 ## 🎉 Usage
 
 Whenever a "NaiLong" meme is recognized, it will be retracted and notified.
-
-Cloud Deployment: The [run_with_napcat_en.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat_en.ipynb) file supports one-click deployment on platforms like Kaggle or Huggingface's Spaces. You can complete the bot deployment simply by clicking "Run" and scanning the QR code!
 
 To store errored images locally (for `SUPERUSERS`): Send "This is [type]"+image, for example: "This is nailong+image",
 and it will be automatically stored locally. When similarity detection is on, in the next image check, it will

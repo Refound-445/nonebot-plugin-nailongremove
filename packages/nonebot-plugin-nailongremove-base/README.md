@@ -69,12 +69,18 @@ NaiLongRemove 是一款由简单的 AI 模型建立的奶龙识别插件，可�
 
 ## 💿 安装
 
+### 1.云部署
+
+[run_with_napcat.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat.ipynb)文件，支持Kaggle或者Huggingface的Space等一键部署，仅需点击运行和扫码即可完成bot部署！
+
+### 2.本地部署
+
 **如果你从来没接触过
 NoneBot，请查看 [这个文档](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/docs/tutorial.md)**
 
 为避免依赖问题，我们把使用 GPU 推理的插件安装方式与普通安装分开了，供有需要的用户选择安装
 
-### 使用 CPU 推理
+#### 使用 CPU 推理
 
 以下提到的方法 任选**其一** 即可
 
@@ -137,7 +143,7 @@ plugins = [
 
 </details>
 
-### 使用 GPU 推理
+#### 使用 GPU 推理
 
 <details>
 <summary>点击展开</summary>
@@ -261,8 +267,6 @@ pip install nonebot-plugin-nailongremove-base -U
 ## 🎉 使用
 
 只要有人发奶龙表情包被识别出来，就会被撤回并提醒。
-
-云部署：[run_with_napcat.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat.ipynb)文件，支持Kaggle或者Huggingface的Space等一键部署，仅需点击运行和扫码即可完成bot部署！
 
 本地存储报错图片（限`SUPERUSERS`）：发送"这是[种类]"+图片，例如："这是nailong+图片"，便会自动存储到本地，开启相似度检测后，在下一次检测图片会优先识别本地已存储的图片。
 
