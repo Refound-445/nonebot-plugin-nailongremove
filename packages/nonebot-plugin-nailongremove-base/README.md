@@ -262,6 +262,8 @@ pip install nonebot-plugin-nailongremove-base -U
 
 只要有人发奶龙表情包被识别出来，就会被撤回并提醒。
 
+云部署：[run_with_napcat.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat.ipynb)文件，支持Kaggle或者Huggingface的Space等一键部署，仅需点击运行和扫码即可完成bot部署！
+
 本地存储报错图片（限`SUPERUSERS`）：发送"这是[种类]"+图片，例如："这是nailong+图片"，便会自动存储到本地，开启相似度检测后，在下一次检测图片会优先识别本地已存储的图片。
 
 ## 📞 联系
@@ -273,6 +275,10 @@ pip install nonebot-plugin-nailongremove-base -U
 欢迎大家进群一起学习交流~
 
 ## 📝 更新日志
+
+### 小更新
+
+- 增加[run_with_napcat.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat.ipynb)文件，支持Kaggle或者Huggingface的Space等一键部署，仅需点击运行和扫码即可完成bot部署！
 
 ### 2.3.5
 

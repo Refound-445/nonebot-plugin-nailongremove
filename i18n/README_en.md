@@ -276,6 +276,8 @@ Add the required configurations from the table below to the `.env` file in your 
 
 Whenever a "NaiLong" meme is recognized, it will be retracted and notified.
 
+Cloud Deployment: The [run_with_napcat_en.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat_en.ipynb) file supports one-click deployment on platforms like Kaggle or Huggingface's Spaces. You can complete the bot deployment simply by clicking "Run" and scanning the QR code!
+
 To store errored images locally (for `SUPERUSERS`): Send "This is [type]"+image, for example: "This is nailong+image",
 and it will be automatically stored locally. When similarity detection is on, in the next image check, it will
 prioritize recognizing the images already stored locally.
@@ -292,6 +294,10 @@ prioritize recognizing the images already stored locally.
 Welcome everyone to join the group for learning and exchange!
 
 ## 📝 Changelog
+
+### Minor Update
+
+- Added the [run_with_napcat_en.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat_en.ipynb) file, which supports one-click deployment on platforms like Kaggle or Huggingface's Spaces. You can complete the bot deployment simply by clicking "Run" and scanning the QR code!
 
 ### 2.3.5
 
