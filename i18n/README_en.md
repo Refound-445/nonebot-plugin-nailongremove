@@ -78,7 +78,8 @@ still occur to varying degrees. Feedback is welcome!
 
 ### Cloud Deployment
 
-The [run_with_napcat_en.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat_en.ipynb) file supports one-click deployment on platforms like Kaggle or Huggingface's Spaces. You can complete the bot deployment simply by clicking "Run" and scanning the QR code!
+- The [run_with_napcat_en.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat_en.ipynb) file supports one-click deployment on platforms like Kaggle or Huggingface's Spaces. You can complete the bot deployment simply by clicking "Run" and scanning the QR code!
+- Supports [Docker](https://github.com/Refound-445/nonebot-plugin-nailongremove/tree/main/docker) one-click deployment.
 
 ### Local Deployment
 
@@ -302,7 +303,7 @@ Welcome everyone to join the group for learning and exchange!
 ### Minor Update
 
 - Added the [run_with_napcat_en.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat_en.ipynb) file, which supports one-click deployment on platforms like Kaggle or Huggingface's Spaces. You can complete the bot deployment simply by clicking "Run" and scanning the QR code!
-
+- Added [Docker](https://github.com/Refound-445/nonebot-plugin-nailongremove/tree/main/docker) one-click deployment.
 ### 2.3.5
 
 - The update adds a feature to select a mute tag, allowing users to choose whether to mute or recall the processing for

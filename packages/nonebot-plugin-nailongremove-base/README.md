@@ -71,7 +71,8 @@ NaiLongRemove 是一款由简单的 AI 模型建立的奶龙识别插件，可�
 
 ### 1.云部署
 
-[run_with_napcat.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat.ipynb)文件，支持Kaggle或者Huggingface的Space等一键部署，仅需点击运行和扫码即可完成bot部署！
+- [run_with_napcat.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat.ipynb)文件，支持Kaggle或者Huggingface的Space等一键部署，仅需点击运行和扫码即可完成bot部署！
+- 支持[Docker](https://github.com/Refound-445/nonebot-plugin-nailongremove/tree/main/docker)一键部署
 
 ### 2.本地部署
 
@@ -283,6 +284,7 @@ pip install nonebot-plugin-nailongremove-base -U
 ### 小更新
 
 - 增加[run_with_napcat.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat.ipynb)文件，支持Kaggle或者Huggingface的Space等一键部署，仅需点击运行和扫码即可完成bot部署！
+- 增加[Docker](https://github.com/Refound-445/nonebot-plugin-nailongremove/tree/main/docker)一键部署
 
 ### 2.3.5
 
