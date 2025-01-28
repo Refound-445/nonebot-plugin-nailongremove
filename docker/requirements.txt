@@ -1,0 +1,5 @@
+nb-cli 
+nb-cli-plugin-bootstrap 
+nonebot2[fastapi] 
+nonebot-adapter-onebot 
+nonebot-plugin-logpile
