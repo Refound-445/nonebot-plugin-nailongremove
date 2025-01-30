@@ -26,15 +26,6 @@ from PIL import Image as Img, ImageSequence
 
 T = TypeVar("T")
 
-import ssl
-SSL_CONTEXT = ssl.create_default_context()
-SSL_CONTEXT.set_ciphers('DEFAULT')
-SSL_CONTEXT.options |= ssl.OP_NO_SSLv2
-SSL_CONTEXT.options |= ssl.OP_NO_SSLv3
-SSL_CONTEXT.options |= ssl.OP_NO_TLSv1
-SSL_CONTEXT.options |= ssl.OP_NO_TLSv1_1
-SSL_CONTEXT.options |= ssl.OP_NO_COMPRESSION
-
 class FrameSource(ABC, Generic[T]):
     def __init__(self, data: T) -> None:
         super().__init__()
