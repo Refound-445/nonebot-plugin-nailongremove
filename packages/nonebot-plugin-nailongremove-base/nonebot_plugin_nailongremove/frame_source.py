@@ -150,9 +150,12 @@ def source_extractor(t: Type[TS]):
 
 @source_extractor(Image)
 async def _(seg: Image):
+    bot =current_bot.get()
+    if bot.adapter.get_name()=="OneBot V11":
+        seg.url = (await bot.get_image(file=seg.id))["data"]["url"].replace("https://", "http://")
     image = await image_fetch(
         current_event.get(),
-        current_bot.get(),
+        bot,
         current_matcher.get().state,
         seg,
     )
