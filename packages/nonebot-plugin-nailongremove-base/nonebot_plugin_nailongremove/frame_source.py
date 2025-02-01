@@ -152,7 +152,7 @@ def source_extractor(t: Type[TS]):
 
 
 async def image_fetch(url: str) -> Optional[bytes]:
-    async with httpx.AsyncClient(verify=False) as client:
+    async with httpx.AsyncClient() as client:
         response = await client.get(url)
         if response.status_code == 200:
             image_data = response.content
