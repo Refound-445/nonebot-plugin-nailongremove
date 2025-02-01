@@ -281,6 +281,10 @@ pip install nonebot-plugin-nailongremove-base -U
 
 ## 📝 更新日志
 
+### 2.3.6
+
+- 修复部分SSL连接错误
+
 ### 小更新
 
 - 增加[run_with_napcat.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat.ipynb)文件，支持Kaggle或者Huggingface的Space等一键部署，仅需点击运行和扫码即可完成bot部署！
