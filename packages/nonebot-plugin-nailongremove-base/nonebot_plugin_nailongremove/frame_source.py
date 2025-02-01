@@ -164,7 +164,7 @@ async def image_fetch(url: str) -> Optional[bytes]:
 @source_extractor(Image)
 async def _(seg: Image):
     image = await image_fetch(
-        seg.data['url'],
+        seg.data['url'].replace('https://multimedia.nt.qq.com.cn/', 'http://multimedia.nt.qq.com.cn/', 1),
     )
     if not image:
         raise RuntimeError("Cannot fetch image")
