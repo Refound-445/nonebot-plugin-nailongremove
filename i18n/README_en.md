@@ -300,6 +300,10 @@ Welcome everyone to join the group for learning and exchange!
 
 ## 📝 Changelog
 
+### 2.3.6
+
+- Fixed some SSL connection errors
+
 ### Minor Update
 
 - Added the [run_with_napcat_en.ipynb](https://github.com/Refound-445/nonebot-plugin-nailongremove/blob/main/ipynb/run_with_napcat_en.ipynb) file, which supports one-click deployment on platforms like Kaggle or Huggingface's Spaces. You can complete the bot deployment simply by clicking "Run" and scanning the QR code!
